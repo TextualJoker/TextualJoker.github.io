@@ -113,6 +113,17 @@
         position: sticky;
         top: 2.5rem;
       }
+      .avatar {
+        display: block;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1.1rem;
+        border: 1px solid var(--brass);
+        padding: 2px;
+        background: var(--ground);
+      }
       .mark {
         font-family: var(--mono);
         font-weight: 700;
@@ -361,47 +372,48 @@
         color: var(--brass);
       }
 
-      /* support */
-      .support {
-        margin-top: 1.25rem;
-        border: 1px dashed var(--hair);
-        border-radius: 2px;
-        padding: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        flex-wrap: wrap;
-      }
-      .support p {
-        margin: 0;
+      /* support — Ko-fi window */
+      .support-intro {
         color: var(--muted);
         font-size: 0.94rem;
-        max-width: 34ch;
+        max-width: 46ch;
+        margin: 0 0 1.25rem;
       }
-      .kofi {
+      .kofi-window {
+        border: 1px solid var(--hair);
+        border-radius: 6px;
+        overflow: hidden;
+        background: var(--panel);
+      }
+      .kofi-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--hair);
         font-family: var(--mono);
-        font-weight: 700;
-        font-size: 0.82rem;
-        letter-spacing: -0.01em;
-        text-decoration: none;
+        font-size: 0.66rem;
+        letter-spacing: 0.02em;
+        color: var(--muted);
+      }
+      .kofi-bar .lights {
+        display: inline-flex;
+        gap: 0.35rem;
+      }
+      .kofi-bar .lights i {
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 50%;
+        background: var(--hair);
+      }
+      .kofi-bar .lights i:first-child {
         background: var(--brass);
-        color: #16130c;
-        padding: 0.7rem 1.3rem;
-        border-radius: 2px;
-        white-space: nowrap;
-        transition:
-          transform 0.15s ease,
-          filter 0.15s ease;
       }
-      .kofi:hover,
-      .kofi:focus-visible {
-        transform: translateY(-2px);
-        filter: brightness(1.08);
-      }
-      .kofi:focus-visible {
-        outline: 2px solid var(--ink);
-        outline-offset: 2px;
+      .kofi-window iframe {
+        display: block;
+        width: 100%;
+        border: none;
+        background: #f9f9f9;
       }
 
       footer {
@@ -464,6 +476,13 @@
     <div class="wrap">
       <aside class="rail">
         <div class="rail-sticky">
+          <img
+            class="avatar"
+            src="https://github.com/TextualJoker.png?size=160"
+            alt="TextualJoker"
+            width="48"
+            height="48"
+          />
           <a class="mark" href="#top"
             ><span class="prompt">~/</span>textualjoker<span
               class="cursor"
@@ -555,8 +574,8 @@
             <div class="entry">
               <p>
                 Fixed a bug that silently dropped every multi-line message I got
-                sent. Turned out to be one missing flag on a
-                <code>curl</code> call. Classic.
+                sent. Turned out to be one missing flag on a <code>curl</code>
+                call. Classic.
               </p>
               <span class="by agent">— the agent, 11:04, while I slept</span>
             </div>
@@ -594,14 +613,23 @@
         </ul>
 
         <p class="eyebrow" id="support">Buy me a coffee</p>
-        <div class="support">
-          <p>
-            Everything I make is free and ad-free. If it made your day a little
-            calmer, a coffee keeps the Pi humming.
-          </p>
-          <a class="kofi" href="https://ko-fi.com/textualjoker"
-            >☕ Support on Ko-fi</a
-          >
+        <p class="support-intro">
+          Everything I make is free and ad-free. If it made your day a little
+          calmer, a coffee keeps the Pi humming — right here, no need to leave
+          the page.
+        </p>
+        <div class="kofi-window">
+          <div class="kofi-bar">
+            <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>support · ko-fi.com/textualjoker</span>
+          </div>
+          <iframe
+            id="kofiframe"
+            src="https://ko-fi.com/textualjoker/?hidefeed=true&widget=true&embed=true&preview=true"
+            height="680"
+            title="Support TextualJoker on Ko-fi"
+            loading="lazy"
+          ></iframe>
         </div>
 
         <footer>
