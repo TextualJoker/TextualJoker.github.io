@@ -416,6 +416,130 @@
         background: #f9f9f9;
       }
 
+      /* ── Game Boy (the toy on the desk) ── */
+      .gb {
+        width: 100%;
+        max-width: 18rem;
+        margin: 0.25rem 0 0;
+        padding: 1rem 1rem 1.3rem;
+        background: linear-gradient(158deg, #2b2e35, #16181d);
+        border: 1px solid var(--hair);
+        border-radius: 12px 12px 34px 12px;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.05),
+          0 12px 34px rgba(0, 0, 0, 0.4);
+      }
+      .gb-screen {
+        background: linear-gradient(158deg, #1b1d23, #0b0c0f);
+        border-radius: 7px 7px 10px 7px;
+        padding: 0.85rem 1rem 1rem;
+        border: 1px solid rgba(0, 0, 0, 0.55);
+      }
+      .gb-topline {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin: 0 0 0.55rem;
+        font-family: var(--mono);
+        font-size: 0.48rem;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: #7c7d86;
+      }
+      .gb-led {
+        width: 0.42rem;
+        height: 0.42rem;
+        border-radius: 50%;
+        background: var(--brass);
+        box-shadow: 0 0 6px var(--brass);
+        animation: gbpulse 2.4s ease-in-out infinite;
+      }
+      @keyframes gbpulse {
+        50% {
+          opacity: 0.35;
+        }
+      }
+      canvas.gb-lcd {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 160 / 144;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        background: #9bbc0f;
+        border-radius: 3px;
+      }
+      .gb-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 1.1rem;
+        padding: 0 0.35rem;
+      }
+      .dpad {
+        position: relative;
+        width: 3rem;
+        height: 3rem;
+      }
+      .dpad::before,
+      .dpad::after {
+        content: "";
+        position: absolute;
+        background: #0b0c0f;
+        border-radius: 3px;
+      }
+      .dpad::before {
+        left: 34%;
+        right: 34%;
+        top: 2%;
+        bottom: 2%;
+      }
+      .dpad::after {
+        top: 34%;
+        bottom: 34%;
+        left: 2%;
+        right: 2%;
+      }
+      .ab {
+        display: flex;
+        gap: 0.7rem;
+        transform: rotate(-20deg);
+      }
+      .ab b {
+        width: 1.7rem;
+        height: 1.7rem;
+        border-radius: 50%;
+        background: var(--brass);
+        color: #16130c;
+        font: 700 0.7rem var(--mono);
+        display: grid;
+        place-items: center;
+      }
+      .gb-ss {
+        display: flex;
+        gap: 0.9rem;
+        justify-content: center;
+        margin-top: 0.9rem;
+      }
+      .gb-ss i {
+        width: 1.6rem;
+        height: 0.4rem;
+        border-radius: 4px;
+        background: #0b0c0f;
+        transform: rotate(-20deg);
+      }
+      .gb-cap {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--muted);
+        margin: 1rem 0 0;
+        max-width: 30ch;
+      }
+      .gb-cap b {
+        color: var(--brass);
+        font-weight: 600;
+      }
+
       footer {
         margin-top: 3.5rem;
         padding-top: 1.5rem;
@@ -538,6 +662,31 @@
           lives.
         </p>
 
+        <p class="eyebrow">On shift</p>
+        <div class="gb">
+          <div class="gb-screen">
+            <p class="gb-topline">
+              <span class="gb-led" aria-hidden="true"></span>GridJoy · dev build
+            </p>
+            <canvas
+              class="gb-lcd"
+              width="160"
+              height="144"
+              role="img"
+              aria-label="A Game Boy screen: a pixel ghost and a pixel developer amble around a little room, under a framed puzzle grid."
+            ></canvas>
+          </div>
+          <div class="gb-controls">
+            <div class="dpad" aria-hidden="true"></div>
+            <div class="ab" aria-hidden="true"><b>B</b><b>A</b></div>
+          </div>
+          <div class="gb-ss" aria-hidden="true"><i></i><i></i></div>
+        </div>
+        <p class="gb-cap">
+          <b>Me + the agent</b>, working the same little room. One of us needs
+          coffee. One of us runs on a cron.
+        </p>
+
         <p class="eyebrow">Now building</p>
         <a class="proj" href="https://gridjoy.app">
           <div class="proj-top">
@@ -640,5 +789,143 @@
         </footer>
       </main>
     </div>
+    <script>
+      // The Game Boy LCD — a tiny ambient scene rendered on a 160×144 canvas in
+      // the 4-shade DMG palette. Two sprites (a ghost + a dev) amble a little
+      // room under a framed puzzle grid. Pure canvas, no assets. Honours
+      // prefers-reduced-motion by drawing a single still frame.
+      (function () {
+        var cv = document.querySelector(".gb-lcd");
+        if (!cv || !cv.getContext) return;
+        var ctx = cv.getContext("2d");
+        var P = ["#9bbc0f", "#8bac0f", "#306230", "#0f380f"]; // light → dark
+
+        // '.' transparent · 0–3 palette index
+        var GHOST = [
+          "..3333..",
+          ".311113.",
+          "31111113",
+          "31311313",
+          "31111113",
+          "31111113",
+          "31111113",
+          "31111113",
+          "31111113",
+          "3.31.13.",
+        ];
+        var DEV = [
+          "..333...",
+          ".30003..",
+          ".30003..",
+          "..333...",
+          ".32223..",
+          "322223..",
+          "322223..",
+          ".2222...",
+          ".2222...",
+        ];
+        var LEGS = [
+          [".2..2...", ".3..3..."],
+          ["..22....", "...22..."],
+        ];
+
+        function px(x, y, ci) {
+          if (ci === ".") return;
+          ctx.fillStyle = P[+ci];
+          ctx.fillRect(x, y, 1, 1);
+        }
+        function sprite(rows, x, y, flip) {
+          for (var r = 0; r < rows.length; r++) {
+            var row = rows[r];
+            for (var c = 0; c < row.length; c++) {
+              var cx = flip ? x + (row.length - 1 - c) : x + c;
+              px(cx, y + r, row[c]);
+            }
+          }
+        }
+
+        function scene() {
+          ctx.fillStyle = P[0];
+          ctx.fillRect(0, 0, 160, 144);
+          // floor
+          ctx.fillStyle = P[2];
+          ctx.fillRect(0, 118, 160, 26);
+          ctx.fillStyle = P[3];
+          ctx.fillRect(0, 118, 160, 1);
+          // framed puzzle grid on the wall (a little Sudoku nod)
+          var gx = 112,
+            gy = 16,
+            gs = 30;
+          ctx.fillStyle = P[3];
+          ctx.fillRect(gx - 2, gy - 2, gs + 4, gs + 4);
+          ctx.fillStyle = P[1];
+          ctx.fillRect(gx, gy, gs, gs);
+          ctx.fillStyle = P[3];
+          for (var i = 1; i < 3; i++) {
+            ctx.fillRect(gx + (gs / 3) * i, gy, 1, gs);
+            ctx.fillRect(gx, gy + (gs / 3) * i, gs, 1);
+          }
+          // a plant, bottom-left
+          ctx.fillStyle = P[3];
+          ctx.fillRect(18, 108, 10, 10);
+          ctx.fillStyle = P[2];
+          ctx.fillRect(20, 96, 2, 12);
+          ctx.fillRect(16, 100, 4, 3);
+          ctx.fillRect(24, 100, 4, 3);
+        }
+
+        var dev = { x: 34, dir: 1 },
+          gh = { x: 96, dir: -1, ph: 0 },
+          tick = 0;
+
+        function render() {
+          scene();
+          var gy = 99 + Math.round(Math.sin(gh.ph) * 2);
+          sprite(GHOST, Math.round(gh.x), gy, gh.dir < 0);
+          var walk = LEGS[tick % 2];
+          sprite(DEV, Math.round(dev.x), 106, dev.dir < 0);
+          sprite(walk, Math.round(dev.x), 115, dev.dir < 0);
+        }
+
+        var reduce =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduce) {
+          render();
+          return;
+        }
+
+        var last = 0,
+          acc = 0;
+        function loop(ts) {
+          requestAnimationFrame(loop);
+          if (!last) last = ts;
+          acc += ts - last;
+          last = ts;
+          if (acc < 90) return;
+          acc = 0;
+          tick++;
+          dev.x += dev.dir;
+          if (dev.x < 8) {
+            dev.x = 8;
+            dev.dir = 1;
+          } else if (dev.x > 138) {
+            dev.x = 138;
+            dev.dir = -1;
+          }
+          gh.x += gh.dir * 0.8;
+          if (gh.x < 8) {
+            gh.x = 8;
+            gh.dir = 1;
+          } else if (gh.x > 138) {
+            gh.x = 138;
+            gh.dir = -1;
+          }
+          gh.ph += 0.5;
+          render();
+        }
+        requestAnimationFrame(loop);
+      })();
+    </script>
   </body>
 </html>
