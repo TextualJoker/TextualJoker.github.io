@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TextualJoker — build log</title>
+    <meta
+      name="description"
+      content="A solo dev shipping calm, ad-free software out loud — one Raspberry Pi, an AI agent that never idles, and an honest log of what gets built. Maker of GridJoy."
+    />
+    <meta name="author" content="TextualJoker" />
+    <link rel="canonical" href="https://textualjoker.github.io/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="TextualJoker — build log" />
+    <meta
+      property="og:description"
+      content="A solo dev shipping calm, ad-free software out loud. Maker of GridJoy."
+    />
+    <meta property="og:url" content="https://textualjoker.github.io/" />
+    <meta name="theme-color" content="#0c0d10" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0d10'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23e0a43b' text-anchor='middle'%3E~/%3C/text%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --ground: #f6f4ef;
+        --panel: #efece4;
+        --ink: #1b1a17;
+        --muted: #6b6a63;
+        --hair: #d8d4c8;
+        --brass: #b87a1e;
+        --live: #2f8f63;
+        --spine: 40rem;
+        --mono:
+          ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo,
+          Consolas, monospace;
+        --sans:
+          ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --ground: #0c0d10;
+          --panel: #131519;
+          --ink: #e7e6e3;
+          --muted: #8a8b93;
+          --hair: #23262d;
+          --brass: #e0a43b;
+          --live: #5fb98a;
+        }
+      }
+      :root[data-theme="light"] {
+        --ground: #f6f4ef;
+        --panel: #efece4;
+        --ink: #1b1a17;
+        --muted: #6b6a63;
+        --hair: #d8d4c8;
+        --brass: #b87a1e;
+        --live: #2f8f63;
+      }
+      :root[data-theme="dark"] {
+        --ground: #0c0d10;
+        --panel: #131519;
+        --ink: #e7e6e3;
+        --muted: #8a8b93;
+        --hair: #23262d;
+        --brass: #e0a43b;
+        --live: #5fb98a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--ink);
+        font-family: var(--sans);
+        line-height: 1.65;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: inherit;
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 0.86em;
+        background: color-mix(in srgb, var(--brass) 14%, transparent);
+        padding: 0.05em 0.35em;
+        border-radius: 2px;
+      }
+
+      .wrap {
+        display: grid;
+        grid-template-columns: 15rem minmax(0, 1fr);
+        gap: 0;
+        max-width: 66rem;
+        margin: 0 auto;
+        min-height: 100vh;
+      }
+
+      /* ── Status rail ── */
+      .rail {
+        border-right: 1px solid var(--hair);
+        padding: 2.5rem 1.75rem;
+      }
+      .rail-sticky {
+        position: sticky;
+        top: 2.5rem;
+      }
+      .mark {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        display: inline-flex;
+        align-items: baseline;
+        text-decoration: none;
+      }
+      .mark .prompt {
+        color: var(--brass);
+        margin-right: 0.4ch;
+      }
+      .cursor {
+        display: inline-block;
+        width: 0.55ch;
+        height: 1em;
+        margin-left: 0.15ch;
+        background: var(--brass);
+        transform: translateY(0.12em);
+        animation: blink 1.1s steps(1) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .status {
+        list-style: none;
+        margin: 2.5rem 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+      }
+      .status li {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .status .k {
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.62rem;
+      }
+      .status .v {
+        color: var(--ink);
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+      .status a.v {
+        text-decoration: none;
+      }
+      .status a.v:hover {
+        color: var(--brass);
+      }
+      .dot {
+        display: inline-block;
+        width: 0.5em;
+        height: 0.5em;
+        border-radius: 50%;
+        background: var(--live);
+        margin-right: 0.5ch;
+        box-shadow: 0 0 0 0.28em
+          color-mix(in srgb, var(--live) 22%, transparent);
+      }
+
+      /* ── Main spine ── */
+      main {
+        padding: 2.5rem 2.75rem 4rem;
+        max-width: var(--spine);
+      }
+
+      .term {
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin: 0 0 2rem;
+      }
+      .term .prompt {
+        color: var(--brass);
+      }
+      .term .typed {
+        color: var(--ink);
+      }
+
+      h1 {
+        font-family: var(--mono);
+        font-size: clamp(2.1rem, 6vw, 3.15rem);
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1.02;
+        margin: 0 0 1.1rem;
+        text-wrap: balance;
+      }
+      h1 .lo {
+        color: var(--muted);
+      }
+
+      .thesis {
+        font-size: 1.18rem;
+        line-height: 1.55;
+        max-width: 34ch;
+        margin: 0 0 1.75rem;
+        text-wrap: balance;
+      }
+      .thesis .hi {
+        color: var(--brass);
+        font-weight: 600;
+        background: linear-gradient(
+          transparent 68%,
+          color-mix(in srgb, var(--brass) 16%, transparent) 68%
+        );
+      }
+
+      .lede {
+        color: var(--muted);
+        max-width: 58ch;
+        margin: 0 0 2rem;
+        font-size: 0.98rem;
+      }
+
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 0.64rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--brass);
+        margin: 3.25rem 0 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .eyebrow::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--hair);
+      }
+
+      /* project card */
+      .proj {
+        display: block;
+        text-decoration: none;
+        border: 1px solid var(--hair);
+        border-radius: 2px;
+        padding: 1.4rem 1.5rem;
+        background: var(--panel);
+        transition:
+          border-color 0.18s ease,
+          transform 0.18s ease;
+      }
+      .proj:hover,
+      .proj:focus-visible {
+        border-color: var(--brass);
+        transform: translateY(-2px);
+      }
+      .proj:focus-visible {
+        outline: 2px solid var(--brass);
+        outline-offset: 2px;
+      }
+      .proj-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .proj h3 {
+        font-family: var(--mono);
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      .proj .tag {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--live);
+        white-space: nowrap;
+      }
+      .proj p {
+        margin: 0.5rem 0 0.9rem;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+      .proj .meta {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--ink);
+        display: flex;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .proj .meta b {
+        color: var(--brass);
+        font-weight: 700;
+      }
+      .proj .go {
+        color: var(--brass);
+      }
+
+      /* build log */
+      .log {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .log li {
+        display: grid;
+        grid-template-columns: 6.5rem 1fr;
+        gap: 1rem;
+        padding: 1.05rem 0;
+        border-bottom: 1px solid var(--hair);
+      }
+      .log li:first-child {
+        border-top: 1px solid var(--hair);
+      }
+      .log time {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
+        padding-top: 0.15rem;
+      }
+      .log .entry p {
+        margin: 0;
+        font-size: 0.96rem;
+      }
+      .log .by {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--muted);
+        margin-top: 0.3rem;
+        display: inline-block;
+      }
+      .log .by.agent {
+        color: var(--brass);
+      }
+
+      /* support */
+      .support {
+        margin-top: 1.25rem;
+        border: 1px dashed var(--hair);
+        border-radius: 2px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .support p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+        max-width: 34ch;
+      }
+      .kofi {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 0.82rem;
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        background: var(--brass);
+        color: #16130c;
+        padding: 0.7rem 1.3rem;
+        border-radius: 2px;
+        white-space: nowrap;
+        transition:
+          transform 0.15s ease,
+          filter 0.15s ease;
+      }
+      .kofi:hover,
+      .kofi:focus-visible {
+        transform: translateY(-2px);
+        filter: brightness(1.08);
+      }
+      .kofi:focus-visible {
+        outline: 2px solid var(--ink);
+        outline-offset: 2px;
+      }
+
+      footer {
+        margin-top: 3.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--hair);
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--muted);
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      footer a {
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: var(--brass);
+      }
+
+      @media (max-width: 46rem) {
+        .wrap {
+          grid-template-columns: 1fr;
+        }
+        .rail {
+          border-right: none;
+          border-bottom: 1px solid var(--hair);
+          padding: 2rem 1.75rem 1.5rem;
+        }
+        .rail-sticky {
+          position: static;
+        }
+        .status {
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 1.5rem 2rem;
+          margin-top: 1.75rem;
+        }
+        main {
+          padding: 2rem 1.75rem 3rem;
+        }
+        .log li {
+          grid-template-columns: 1fr;
+          gap: 0.25rem;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .cursor {
+          animation: none;
+        }
+        .proj,
+        .kofi {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <aside class="rail">
+        <div class="rail-sticky">
+          <a class="mark" href="#top"
+            ><span class="prompt">~/</span>textualjoker<span
+              class="cursor"
+              aria-hidden="true"
+            ></span
+          ></a>
+          <ul class="status">
+            <li>
+              <span class="k">Status</span>
+              <span class="v"
+                ><span class="dot" aria-hidden="true"></span>Shipping, in
+                public</span
+              >
+            </li>
+            <li>
+              <span class="k">Flagship</span>
+              <a class="v" href="https://gridjoy.app">GridJoy — live</a>
+            </li>
+            <li>
+              <span class="k">Stack</span>
+              <span class="v">TypeScript · RN · a Pi 5</span>
+            </li>
+            <li>
+              <span class="k">Elsewhere</span>
+              <a class="v" href="https://github.com/TextualJoker">github ↗</a>
+            </li>
+            <li>
+              <span class="k">Support</span>
+              <a class="v" href="#support">ko-fi ↓</a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <main id="top">
+        <p class="term">
+          <span class="prompt">textualjoker&nbsp;$</span> whoami<br />
+          <span class="typed">a solo dev who ships small things well</span>
+        </p>
+
+        <h1>I build calm software, <span class="lo">out loud.</span></h1>
+
+        <p class="thesis">
+          One dev, a Raspberry Pi, and an
+          <span class="hi">AI agent that never idles</span> — shipping software
+          the honest way.
+        </p>
+
+        <p class="lede">
+          No growth hacks, no dark patterns, no ad-sludge. Just a running log of
+          what got built, what broke, and what I learned — a lot of it committed
+          while I was asleep and reviewed over coffee. This is where that work
+          lives.
+        </p>
+
+        <p class="eyebrow">Now building</p>
+        <a class="proj" href="https://gridjoy.app">
+          <div class="proj-top">
+            <h3>GridJoy</h3>
+            <span class="tag">● Live · Android</span>
+          </div>
+          <p>
+            18 number-puzzle types in one calm, wordless app — with a ghost
+            companion that grows as you solve. 100% ad-free, no in-app
+            purchases, no sign-up, works offline.
+          </p>
+          <div class="meta">
+            <span><b>18</b> puzzle types</span>
+            <span><b>0</b> ads</span>
+            <span class="go">gridjoy.app →</span>
+          </div>
+        </a>
+
+        <p class="eyebrow">Build log</p>
+        <ul class="log">
+          <li>
+            <time datetime="2026-07-06">Jul 06</time>
+            <div class="entry">
+              <p>
+                Went <strong>100% ad-free</strong> — stripped the ad SDK out of
+                the app and rewrote every store page so "no ads" is a promise,
+                not a footnote.
+              </p>
+              <span class="by">— me, deliberately</span>
+            </div>
+          </li>
+          <li>
+            <time datetime="2026-07-06">Jul 06</time>
+            <div class="entry">
+              <p>
+                Fixed a bug that silently dropped every multi-line message I got
+                sent. Turned out to be one missing flag on a
+                <code>curl</code> call. Classic.
+              </p>
+              <span class="by agent">— the agent, 11:04, while I slept</span>
+            </div>
+          </li>
+          <li>
+            <time datetime="2026-07-06">Jul 06</time>
+            <div class="entry">
+              <p>
+                Taught the homepage to tell AI search engines the plain truth:
+                no ads, no in-app purchases, works offline.
+              </p>
+              <span class="by agent">— the agent</span>
+            </div>
+          </li>
+          <li>
+            <time datetime="2026-07-04">Jul 04</time>
+            <div class="entry">
+              <p>
+                First GridJoy puzzle book went live on Amazon. Every single
+                answer was machine-verified before it ever reached a page.
+              </p>
+              <span class="by">— me + the agent</span>
+            </div>
+          </li>
+          <li>
+            <time datetime="2026-07-03">Jul 03</time>
+            <div class="entry">
+              <p>
+                Rebuilt the whole app on a newer engine in one pass. 5,000+
+                automated tests, all still green.
+              </p>
+              <span class="by agent">— the agent</span>
+            </div>
+          </li>
+        </ul>
+
+        <p class="eyebrow" id="support">Buy me a coffee</p>
+        <div class="support">
+          <p>
+            Everything I make is free and ad-free. If it made your day a little
+            calmer, a coffee keeps the Pi humming.
+          </p>
+          <a class="kofi" href="https://ko-fi.com/textualjoker"
+            >☕ Support on Ko-fi</a
+          >
+        </div>
+
+        <footer>
+          <a href="https://gridjoy.app">gridjoy.app</a>
+          <a href="https://github.com/TextualJoker">github</a>
+          <a href="https://ko-fi.com/textualjoker">ko-fi</a>
+          <span style="margin-left: auto">Built on a Raspberry Pi</span>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
