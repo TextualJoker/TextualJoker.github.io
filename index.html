@@ -790,101 +790,186 @@
       </main>
     </div>
     <script>
-      // The Game Boy LCD — a tiny ambient scene rendered on a 160×144 canvas in
-      // the 4-shade DMG palette. Two sprites (a ghost + a dev) amble a little
-      // room under a framed puzzle grid. Pure canvas, no assets. Honours
-      // prefers-reduced-motion by drawing a single still frame.
+      // The Game Boy LCD — a top-down "overworld" scene (Pokémon-style) on a
+      // 160×144 canvas in the 4-shade DMG palette. Two sprites — a trainer (me)
+      // and the ghost — wander a tiled room past a PC, a framed puzzle grid and
+      // a couple of plants. The static room is drawn once to an offscreen
+      // canvas and blitted each frame; only the sprites move. Pure canvas, no
+      // assets. Honours prefers-reduced-motion with a single still frame.
       (function () {
         var cv = document.querySelector(".gb-lcd");
         if (!cv || !cv.getContext) return;
         var ctx = cv.getContext("2d");
+        var W = 160,
+          H = 144,
+          S = 2; // sprite pixel scale → 8-wide maps render 16px wide
         var P = ["#9bbc0f", "#8bac0f", "#306230", "#0f380f"]; // light → dark
 
-        // '.' transparent · 0–3 palette index
+        // 8-wide pixel maps ('.' transparent · 0–3 palette index)
+        var TRAINER = [
+          "..3333..",
+          ".333333.",
+          ".311113.",
+          ".310013.",
+          ".311113.",
+          ".322223.",
+          "3222223.",
+          ".32223..",
+          ".3...3..",
+        ];
         var GHOST = [
           "..3333..",
           ".311113.",
           "31111113",
-          "31311313",
+          "31011013",
           "31111113",
           "31111113",
           "31111113",
-          "31111113",
-          "31111113",
-          "3.31.13.",
-        ];
-        var DEV = [
-          "..333...",
-          ".30003..",
-          ".30003..",
-          "..333...",
-          ".32223..",
-          "322223..",
-          "322223..",
-          ".2222...",
-          ".2222...",
-        ];
-        var LEGS = [
-          [".2..2...", ".3..3..."],
-          ["..22....", "...22..."],
+          "3.3..3.3",
         ];
 
-        function px(x, y, ci) {
-          if (ci === ".") return;
-          ctx.fillStyle = P[+ci];
-          ctx.fillRect(x, y, 1, 1);
+        // ── static room, drawn once ──────────────────────────────
+        var off = document.createElement("canvas");
+        off.width = W;
+        off.height = H;
+        var octx = off.getContext("2d");
+
+        function plant(x, y) {
+          octx.fillStyle = P[3];
+          octx.fillRect(x, y + 10, 12, 8); // pot
+          octx.fillStyle = P[2];
+          octx.fillRect(x + 5, y, 2, 10); // stem
+          octx.fillRect(x, y + 2, 6, 4);
+          octx.fillRect(x + 6, y + 2, 6, 4);
+          octx.fillRect(x + 3, y - 2, 6, 4);
         }
-        function sprite(rows, x, y, flip) {
-          for (var r = 0; r < rows.length; r++) {
-            var row = rows[r];
+
+        function buildRoom() {
+          // floor
+          octx.fillStyle = P[0];
+          octx.fillRect(0, 0, W, H);
+          // diamond-lattice tiling (the Pokémon-Center floor motif)
+          octx.fillStyle = P[1];
+          for (var y = 58; y < H; y += 10) {
+            var row = (y - 58) / 10;
+            for (var x = row % 2 ? 5 : 10; x < W - 2; x += 10) {
+              octx.fillRect(x, y - 1, 1, 1);
+              octx.fillRect(x - 1, y, 3, 1);
+              octx.fillRect(x, y + 1, 1, 1);
+            }
+          }
+          // top wall
+          octx.fillStyle = P[2];
+          octx.fillRect(0, 0, W, 52);
+          octx.fillStyle = P[3];
+          octx.fillRect(0, 52, W, 2);
+          // PC / counter on the wall (left)
+          octx.fillStyle = P[3];
+          octx.fillRect(14, 12, 36, 34);
+          octx.fillStyle = P[1];
+          octx.fillRect(18, 16, 28, 20);
+          octx.fillStyle = P[0];
+          octx.fillRect(21, 19, 12, 4);
+          octx.fillRect(21, 26, 8, 3);
+          // framed puzzle grid on the wall (right)
+          var gx = 112,
+            gy = 10,
+            gs = 30;
+          octx.fillStyle = P[3];
+          octx.fillRect(gx - 2, gy - 2, gs + 4, gs + 4);
+          octx.fillStyle = P[0];
+          octx.fillRect(gx, gy, gs, gs);
+          octx.fillStyle = P[3];
+          for (var i = 1; i < 3; i++) {
+            octx.fillRect(gx + 10 * i, gy, 1, gs);
+            octx.fillRect(gx, gy + 10 * i, gs, 1);
+          }
+          // plants in the lower corners
+          plant(8, 120);
+          plant(140, 120);
+        }
+        buildRoom();
+
+        function sprite(map, x, y, flip) {
+          for (var r = 0; r < map.length; r++) {
+            var row = map[r];
             for (var c = 0; c < row.length; c++) {
-              var cx = flip ? x + (row.length - 1 - c) : x + c;
-              px(cx, y + r, row[c]);
+              var ch = row[c];
+              if (ch === ".") continue;
+              var col = flip ? row.length - 1 - c : c;
+              ctx.fillStyle = P[+ch];
+              ctx.fillRect(x + col * S, y + r * S, S, S);
             }
           }
         }
 
-        function scene() {
-          ctx.fillStyle = P[0];
-          ctx.fillRect(0, 0, 160, 144);
-          // floor
-          ctx.fillStyle = P[2];
-          ctx.fillRect(0, 118, 160, 26);
-          ctx.fillStyle = P[3];
-          ctx.fillRect(0, 118, 160, 1);
-          // framed puzzle grid on the wall (a little Sudoku nod)
-          var gx = 112,
-            gy = 16,
-            gs = 30;
-          ctx.fillStyle = P[3];
-          ctx.fillRect(gx - 2, gy - 2, gs + 4, gs + 4);
-          ctx.fillStyle = P[1];
-          ctx.fillRect(gx, gy, gs, gs);
-          ctx.fillStyle = P[3];
-          for (var i = 1; i < 3; i++) {
-            ctx.fillRect(gx + (gs / 3) * i, gy, 1, gs);
-            ctx.fillRect(gx, gy + (gs / 3) * i, gs, 1);
-          }
-          // a plant, bottom-left
-          ctx.fillStyle = P[3];
-          ctx.fillRect(18, 108, 10, 10);
-          ctx.fillStyle = P[2];
-          ctx.fillRect(20, 96, 2, 12);
-          ctx.fillRect(16, 100, 4, 3);
-          ctx.fillRect(24, 100, 4, 3);
+        // deterministic pseudo-random wander (no Math.random → reproducible)
+        var seed = 20260706;
+        function rnd() {
+          seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+          return seed / 0x7fffffff;
         }
 
-        var dev = { x: 34, dir: 1 },
-          gh = { x: 96, dir: -1, ph: 0 },
-          tick = 0;
+        // walk area (below the wall, inside the corners)
+        var MINX = 12,
+          MAXX = 132,
+          MINY = 58,
+          MAXY = 116;
+        var HEAD = [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ];
+
+        function mkChar(x, y, ghost) {
+          return { x: x, y: y, hx: 1, hy: 0, steps: 0, flip: false, bob: 0, ghost: ghost };
+        }
+        var chars = [mkChar(40, 92, false), mkChar(104, 70, true)];
+
+        function move(a) {
+          if (a.steps <= 0) {
+            var h = HEAD[(rnd() * 4) | 0];
+            a.hx = h[0];
+            a.hy = h[1];
+            a.steps = 10 + ((rnd() * 22) | 0);
+            if (a.hx) a.flip = a.hx < 0;
+          }
+          a.steps--;
+          a.x += a.hx * 0.8;
+          a.y += a.hy * 0.7;
+          if (a.x < MINX) {
+            a.x = MINX;
+            a.steps = 0;
+          } else if (a.x > MAXX) {
+            a.x = MAXX;
+            a.steps = 0;
+          }
+          if (a.y < MINY) {
+            a.y = MINY;
+            a.steps = 0;
+          } else if (a.y > MAXY) {
+            a.y = MAXY;
+            a.steps = 0;
+          }
+          a.bob += 1;
+        }
 
         function render() {
-          scene();
-          var gy = 99 + Math.round(Math.sin(gh.ph) * 2);
-          sprite(GHOST, Math.round(gh.x), gy, gh.dir < 0);
-          var walk = LEGS[tick % 2];
-          sprite(DEV, Math.round(dev.x), 106, dev.dir < 0);
-          sprite(walk, Math.round(dev.x), 115, dev.dir < 0);
+          ctx.drawImage(off, 0, 0);
+          // draw back-to-front by y so overlaps look right
+          var order = chars.slice().sort(function (p, q) {
+            return p.y - q.y;
+          });
+          for (var i = 0; i < order.length; i++) {
+            var a = order[i];
+            var yo = a.ghost
+              ? Math.round(Math.sin(a.bob * 0.35) * 2) // float
+              : a.hx || a.hy
+                ? (a.bob & 1) - 0.5 // walk bob
+                : 0;
+            sprite(a.ghost ? GHOST : TRAINER, Math.round(a.x), Math.round(a.y + yo), a.flip);
+          }
         }
 
         var reduce =
@@ -902,26 +987,9 @@
           if (!last) last = ts;
           acc += ts - last;
           last = ts;
-          if (acc < 90) return;
+          if (acc < 100) return;
           acc = 0;
-          tick++;
-          dev.x += dev.dir;
-          if (dev.x < 8) {
-            dev.x = 8;
-            dev.dir = 1;
-          } else if (dev.x > 138) {
-            dev.x = 138;
-            dev.dir = -1;
-          }
-          gh.x += gh.dir * 0.8;
-          if (gh.x < 8) {
-            gh.x = 8;
-            gh.dir = 1;
-          } else if (gh.x > 138) {
-            gh.x = 138;
-            gh.dir = -1;
-          }
-          gh.ph += 0.5;
+          for (var i = 0; i < chars.length; i++) move(chars[i]);
           render();
         }
         requestAnimationFrame(loop);
