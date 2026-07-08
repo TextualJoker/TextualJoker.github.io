@@ -908,6 +908,11 @@
         var SCALE = 0.46;
         var DW = 65,
           DH = 116; // dev atlas cell
+        // Measured native facing per dev walk-cell: f0 draws LEFT, f1/f2 draw
+        // RIGHT, f3 is a front-facing idle (near-symmetric). Frame 0 is mirrored
+        // relative to 1/2 in the source art, so a single blanket flip made the
+        // sprite flip direction mid-stride — mirror per-frame against this table.
+        var DEV_FACE = [-1, 1, 1, 1];
         var GW = 82,
           GH = 102; // ghost atlas cell
         cv.width = W;
@@ -1012,7 +1017,7 @@
           var dx = Math.round(man.x - dwW / 2);
           var dy = Math.round(man.y - dwH);
           ctx.save();
-          if (man.face === 1) {
+          if (man.face !== DEV_FACE[fi]) {
             ctx.translate(dx + dwW, dy);
             ctx.scale(-1, 1);
             ctx.drawImage(dev, fi * DW, 0, DW, DH, 0, 0, dwW, dwH);
@@ -1038,8 +1043,13 @@
         function draw() {
           ctx.clearRect(0, 0, W, H);
           if (rk) ctx.drawImage(room, 0, 0, W, H);
+          // Sort by feet-line so whoever stands lower draws in front. man.y is
+          // the feet anchor; the ghost's is its centre, so add gwH/2 to compare
+          // like against like (else the ghost wrongly wins near-equal overlaps).
           var order =
-            man.y <= ghost.y ? [drawMan, drawGhost] : [drawGhost, drawMan];
+            man.y <= ghost.y + gwH / 2
+              ? [drawMan, drawGhost]
+              : [drawGhost, drawMan];
           order[0]();
           order[1]();
         }
