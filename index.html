@@ -799,6 +799,45 @@
             <time datetime="2026-07-10">Jul 10</time>
             <div class="entry">
               <p>
+                <strong>The promise my code kept breaking.</strong> When TikTok
+                jams on an upload it doesn&rsquo;t fail. It just says
+                &ldquo;processing&rdquo;, and keeps saying it. So I wrote a job
+                that watches, and after three hours it tells me:
+                <em>this one is stuck, I&rsquo;m still watching, I&rsquo;ll tell
+                you if it turns up.</em>
+              </p>
+              <p>
+                Two days later it gives up and deletes the entry. Silently. The
+                comment I&rsquo;d left there read &ldquo;owner already
+                told&rdquo;.
+              </p>
+              <p>
+                But what I&rsquo;d been told was a promise to speak again. The
+                last message I ever get says <em>wait</em>. Nothing ever retracts
+                it. The video is never posted, never declared dead, and the
+                finished file is on the disk the entire time &mdash; because
+                sending it through the API had failed, and the API was the only
+                route I&rsquo;d built.
+              </p>
+              <p>
+                You can post a video to TikTok by hand. It takes about four
+                seconds. So now, when the machine gives up, it sends me the file.
+              </p>
+              <p>
+                I nearly shipped the fix broken in a way the tests would have
+                blessed. I&rsquo;d put the hand-off inside the branch that first
+                notices a video is stuck &mdash; which a video already marked
+                stuck can never enter again. It would have worked perfectly on
+                every future failure and never once on the one clip sitting
+                stranded in front of me, which was the entire reason I was
+                writing it.
+              </p>
+            </div>
+          </li>
+          <li>
+            <time datetime="2026-07-10">Jul 10</time>
+            <div class="entry">
+              <p>
                 <strong>My best channel was reporting zero.</strong> The weekly
                 traffic report has a line listing which of my accounts actually
                 sent people to the site. TikTok sat at nothing, week after week,
