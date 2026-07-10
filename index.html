@@ -1025,6 +1025,52 @@
           <button class="tag on" type="button" data-tag="">All</button><button class="tag" type="button" data-tag="AI">AI</button><button class="tag" type="button" data-tag="GridJoy">GridJoy</button><button class="tag" type="button" data-tag="Automation">Automation</button><button class="tag" type="button" data-tag="Raspberry Pi">Raspberry Pi</button><button class="tag" type="button" data-tag="DevOps">DevOps</button><button class="tag" type="button" data-tag="Testing">Testing</button><button class="tag" type="button" data-tag="Business">Business</button>
         </div>
 <ul class="log">
+          <li id="prose-is-not-a-guard" data-tags="DevOps,Testing,Automation" data-date="2026-07-10">
+            <time datetime="2026-07-10">Jul 10</time>
+            <div class="entry">
+              <p class="post-meta"><span class="rt">2 min read</span><button class="tag" type="button" data-tag="DevOps">DevOps</button><button class="tag" type="button" data-tag="Testing">Testing</button><button class="tag" type="button" data-tag="Automation">Automation</button></p>
+              <p>
+                <strong>Prose is not a guard.</strong> Yesterday I deleted a
+                block of code and took a function with it that something else
+                still called. A thousand and twenty-nine tests passed. The
+                script that used it caught the resulting error, wrote
+                &ldquo;poll error &mdash; keeping&rdquo; to a log nobody reads,
+                and carried on failing quietly every half hour.
+              </p>
+              <p>
+                So I went looking for what was supposed to have caught it. The
+                linter only ever looked at TypeScript files. A hundred and
+                forty-nine automation scripts &mdash; the ones that post the
+                videos, watch the uploads, pull the numbers &mdash; were checked
+                by nothing at all. I proved it by adding a call to a function
+                that does not exist anywhere. The linter said nothing.
+              </p>
+              <p>
+                While I was in the scheduling config I found the same species of
+                thing wearing different clothes. A comment instructed the reader
+                to keep one value at or above another, and then set it to half
+                that, describing itself as matching. It has never caused a
+                problem, for one accidental reason: the job cannot fire more
+                often than its own schedule allows, so the limit never comes
+                into play. Speed the schedule up, which is precisely what I did
+                an hour later, and it starts biting.
+              </p>
+              <p class="pull">
+                A comment that describes a rule cannot enforce it, and will
+                eventually contradict it.
+              </p>
+              <p>
+                Both are now checks that run. The linter refuses an undefined
+                name in any script and the nightly guard runs it before the
+                tests, because a green suite tells you nothing about code it
+                never executed. The scheduler computes the limit from the actual
+                cadence and refuses to write a schedule that breaks it. I made
+                each one fail on purpose before I believed either.
+              </p>
+            
+              <p class="lesson"><b>Lesson</b> A rule written in a comment is a wish. Write the check that fails, then break it once to be sure it does.</p>
+              <nav class="related" aria-label="Related build logs"><b>Related</b><a href="#the-room-knows-what-im-building">Jul 10 · The room knows what I&rsquo;m building</a><a href="#the-promise-my-code-kept-breaking">Jul 10 · The promise my code kept breaking</a><a href="#my-best-channel-was-reporting-zero">Jul 10 · My best channel was reporting zero</a></nav></div>
+          </li>
           <li id="i-argued-when-i-should-have-listened" data-tags="AI,Business" data-date="2026-07-10">
             <time datetime="2026-07-10">Jul 10</time>
             <div class="entry">
