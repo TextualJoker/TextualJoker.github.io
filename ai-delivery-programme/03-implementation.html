@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Implementation</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#F1F0ED; --surface:#FFFFFF; --sunk:#E7E5E1;
+    --ink:#1A1A1E; --ink-soft:#4A4A54; --ink-faint:#6A6A76;
+    --rule:#D8D6D2; --rule-soft:#E6E4E0;
+    --accent:#1F4E79; --accent-soft:#DEE8F1;
+    --good:#2C6446; --good-soft:#DCEAE1;
+    --warn:#8A5A15; --warn-soft:#F3E7D3;
+    --crit:#93313A; --crit-soft:#F4DFE1;
+
+    --display:'Newsreader',Georgia,'Times New Roman',serif;
+    --body:'Libre Franklin','Helvetica Neue',Helvetica,Arial,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --measure:68ch;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#14151A; --surface:#1C1D24; --sunk:#23252E;
+      --ink:#E8E8EE; --ink-soft:#AFB1BD; --ink-faint:#8D90A0;
+      --rule:#2E313B; --rule-soft:#262932;
+      --accent:#6FA8DC; --accent-soft:#152532;
+      --good:#6FBE95; --good-soft:#152720;
+      --warn:#D6A55A; --warn-soft:#2A2214;
+      --crit:#DE858D; --crit-soft:#2C1A1C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#14151A; --surface:#1C1D24; --sunk:#23252E;
+    --ink:#E8E8EE; --ink-soft:#AFB1BD; --ink-faint:#8D90A0;
+    --rule:#2E313B; --rule-soft:#262932;
+    --accent:#6FA8DC; --accent-soft:#152532;
+    --good:#6FBE95; --good-soft:#152720;
+    --warn:#D6A55A; --warn-soft:#2A2214;
+    --crit:#DE858D; --crit-soft:#2C1A1C;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--body); font-size:17px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:940px; margin:0 auto; padding:0 26px 110px;}
+
+  .family{
+    display:flex; flex-wrap:wrap; gap:0; border-bottom:1px solid var(--rule);
+    margin:0 -26px; padding:0 26px; background:var(--surface);
+  }
+  .family a, .family span{
+    font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.09em;
+    text-transform:uppercase; padding:13px 18px 12px; text-decoration:none;
+    color:var(--ink-faint); border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .family .here{color:var(--accent); border-bottom-color:var(--accent); font-weight:600;}
+  .family a:hover{color:var(--ink);}
+  .family a:focus-visible{outline:2px solid var(--accent); outline-offset:-3px;}
+
+  .mast{padding:56px 0 34px; border-bottom:2px solid var(--ink);}
+  .mast .num{
+    font-family:var(--mono); font-size:11.5px; font-weight:600; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--accent); margin:0 0 16px;
+  }
+  .mast h1{
+    font-family:var(--display); font-weight:600; font-size:clamp(38px,6.5vw,62px);
+    line-height:1.02; letter-spacing:-.02em; margin:0 0 20px; max-width:15ch;
+    text-wrap:balance;
+  }
+  .mast .sf{font-size:19px; line-height:1.55; color:var(--ink-soft); max-width:58ch; margin:0;}
+  .mast .meta{
+    display:flex; flex-wrap:wrap; gap:7px 22px; margin-top:22px;
+    font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.04em;
+  }
+
+  .contents{columns:2 250px; column-gap:40px; margin:34px 0 66px;}
+  .contents a{
+    display:block; break-inside:avoid; padding:11px 2px; text-decoration:none;
+    border-bottom:1px solid var(--rule); color:var(--ink);
+    font-size:14.5px; font-weight:500;
+  }
+  .contents a:hover{color:var(--accent); border-bottom-color:var(--accent);}
+  .contents a:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .contents .cn{
+    font-family:var(--mono); font-size:10.5px; font-weight:600; color:var(--accent);
+    margin-right:12px; font-variant-numeric:tabular-nums;
+  }
+
+  section{margin:0 0 70px; scroll-margin-top:20px;}
+  .sh{border-top:2px solid var(--ink); padding-top:14px; margin-bottom:26px;}
+  .sh .eyebrow{
+    font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent); display:block; margin-bottom:10px;
+  }
+  h2{
+    font-family:var(--display); font-weight:600; font-size:clamp(27px,3.6vw,36px);
+    line-height:1.1; letter-spacing:-.015em; margin:0; max-width:24ch; text-wrap:balance;
+  }
+  .sh p{margin:12px 0 0; color:var(--ink-soft); font-size:17px; max-width:var(--measure);}
+  h3{
+    font-family:var(--body); font-weight:700; font-size:16.5px; letter-spacing:-.005em;
+    margin:34px 0 11px; color:var(--ink);
+  }
+  p{margin:0 0 15px; max-width:var(--measure);}
+  strong{font-weight:600; color:var(--ink);}
+  ul,ol{margin:0 0 16px; padding-left:23px; max-width:var(--measure);}
+  li{margin-bottom:8px;}
+  li::marker{color:var(--ink-faint);}
+  code{
+    font-family:var(--mono); font-size:.85em; background:var(--sunk);
+    padding:1px 5px; border:1px solid var(--rule-soft); overflow-wrap:anywhere;
+  }
+  a{color:var(--accent);}
+
+  /* ---------- stage blocks ---------- */
+  .stage{border:1px solid var(--rule); background:var(--surface); margin:0 0 20px;}
+  .stage-h{
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:12px 16px;
+    padding:15px 20px; background:var(--sunk); border-bottom:1px solid var(--rule);
+  }
+  .stage-h .sn{
+    font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.11em;
+    text-transform:uppercase; color:var(--accent); flex:none;
+  }
+  .stage-h h3{
+    font-family:var(--display); font-weight:600; font-size:20px; margin:0;
+    letter-spacing:-.01em; flex:1 1 260px; line-height:1.2;
+  }
+  .stage-h .trig{
+    font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); letter-spacing:.04em;
+  }
+  .stage-b{padding:18px 20px 6px;}
+  .stage-b p:last-child{margin-bottom:14px;}
+  .stage-b ul{margin-bottom:14px;}
+
+  .note{
+    background:var(--surface); border:1px solid var(--rule);
+    border-left:3px solid var(--ink-faint); padding:15px 18px; margin:20px 0;
+  }
+  .note.good{border-left-color:var(--good);}
+  .note.warn{border-left-color:var(--crit);}
+  .note .lbl{
+    display:block; font-family:var(--mono); font-size:10px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px;
+  }
+  .note.good .lbl{color:var(--good);}
+  .note.warn .lbl{color:var(--crit);}
+  .note p{font-size:16px; margin:0 0 10px; max-width:64ch;}
+  .note p:last-child{margin-bottom:0;}
+
+  .verdict{
+    background:var(--accent-soft); border:1px solid var(--accent);
+    padding:20px 22px; margin:22px 0;
+  }
+  .verdict h3{
+    font-family:var(--display); font-weight:600; font-size:20px; line-height:1.25;
+    color:var(--accent); margin:0 0 10px; letter-spacing:-.01em;
+  }
+  .verdict p{font-size:16.5px; margin:0 0 11px; max-width:64ch;}
+  .verdict p:last-child{margin-bottom:0;}
+
+  .scroll{overflow-x:auto; margin:20px 0; border:1px solid var(--rule); background:var(--surface);}
+  table{border-collapse:collapse; width:100%; min-width:560px; font-size:14px; line-height:1.5;}
+  caption{
+    caption-side:top; text-align:left; font-family:var(--mono); font-size:10px;
+    font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-faint); padding:14px 16px 10px;
+  }
+  th{
+    text-align:left; font-family:var(--mono); font-size:10px; font-weight:600;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--ink-faint);
+    padding:9px 16px; border-bottom:2px solid var(--ink); vertical-align:bottom; white-space:nowrap;
+  }
+  td{padding:12px 16px; border-bottom:1px solid var(--rule-soft); vertical-align:top; color:var(--ink-soft);}
+  tbody tr:last-child td{border-bottom:none;}
+  td.k{color:var(--ink); font-weight:600;}
+  td.n{font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap; font-size:13px;}
+
+  .tag{
+    font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.1em;
+    text-transform:uppercase; padding:3px 8px; display:inline-block; white-space:nowrap;
+  }
+  .t-yes{background:var(--good-soft); color:var(--good);}
+  .t-open{background:var(--warn-soft); color:var(--warn);}
+  .t-no{background:var(--crit-soft); color:var(--crit);}
+  .t-info{background:var(--accent-soft); color:var(--accent);}
+
+  .stagenote{font-size:16px; color:var(--ink-soft); margin:0 0 4px; max-width:var(--measure);}
+  footer{border-top:2px solid var(--ink); padding-top:22px; margin-top:16px;}
+  footer p{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:.03em; max-width:70ch; line-height:1.7;}
+
+  @media (max-width:620px){
+    body{font-size:16px;}
+    .wrap{padding:0 18px 80px;}
+    .family{margin:0 -18px; padding:0 18px;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="family" aria-label="Document set">
+  <a href="01-the-evidence.html">01 The Evidence</a>
+  <a href="02-the-plan.html">02 The Plan</a>
+  <span class="here">03 Implementation</span>
+</nav>
+
+<header class="mast">
+  <p class="num">Document 03 of 03</p>
+  <h1>Implementation</h1>
+  <p class="sf">What gets built, in what order, and the small number of things that cannot be added later. Five stages, started by events rather than dates, because a company with no pipeline has no basis for a date.</p>
+  <div class="meta">
+    <span>~30 minutes</span>
+    <span>Five stages, 48 numbered steps</span>
+    <span>Full step detail remains in the original plan</span>
+  </div>
+</header>
+
+<nav class="contents" aria-label="Contents">
+  <a href="#dayone"><span class="cn">01</span>Before the first commit</a>
+  <a href="#unrecoverable"><span class="cn">02</span>The four that cannot be added later</a>
+  <a href="#stages"><span class="cn">03</span>The five stages</a>
+  <a href="#roadmap"><span class="cn">04</span>Forty-eight steps, in order</a>
+  <a href="#standards"><span class="cn">05</span>The standards, and what enforces each</a>
+  <a href="#tests"><span class="cn">06</span>What proves what</a>
+  <a href="#where"><span class="cn">07</span>Where a rule can live</a>
+  <a href="#decay"><span class="cn">08</span>How this rots, and the early warning</a>
+  <a href="#not"><span class="cn">09</span>What not to build yet</a>
+</nav>
+
+<!-- ==================== 01 ==================== -->
+<section id="dayone">
+  <div class="sh">
+    <span class="eyebrow">Stage zero</span>
+    <h2>Before the first commit</h2>
+    <p>The only part of this with a real deadline. All of it is settings, schemas or a page of writing — none of it is code, and none of it needs anyone persuaded of anything.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Eight things, none of which cost money</caption>
+      <thead><tr><th>Item</th><th>What it is</th><th>Cost of not doing it now</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">Human review required</td>
+          <td>A branch protection rule set when the repository is created, with exactly one bypass — the pipeline, on the lowest risk lane only.</td>
+          <td>The highest-return control available, for one setting. <strong>Decide the low-lane bypass now</strong> rather than discovering in month two that two rules you both stated absolutely are incompatible.</td>
+        </tr>
+        <tr>
+          <td class="k">Provenance on every commit</td>
+          <td>A trailer recording whether AI authored the change, plus a check that it is present.</td>
+          <td><span class="tag t-no">Unrecoverable</span> You cannot manage what you cannot attribute, and it cannot be backfilled.</td>
+        </tr>
+        <tr>
+          <td class="k">The telemetry contract</td>
+          <td>Three joins: deploys carry the commit, incidents carry the deploy, test results are stored per run against the commit.</td>
+          <td><span class="tag t-no">Unrecoverable</span> Retrofitting this is the single biggest blocker in established organisations — an instrumentation programme wearing a quality programme's clothes.</td>
+        </tr>
+        <tr>
+          <td class="k">Risk lane definitions</td>
+          <td>Which surfaces are high risk <em>here</em>, applied automatically from the files a change touches.</td>
+          <td>Risk becomes self-declared, and self-declared risk is always low.</td>
+        </tr>
+        <tr>
+          <td class="k">The repository</td>
+          <td>One repository, path-filtered CI from the first commit. The destination, not a migration.</td>
+          <td>Path filtering added later means every change pays for every toolchain until someone fixes it.</td>
+        </tr>
+        <tr>
+          <td class="k">Strictness settings</td>
+          <td>Compiler strictness at its maximum, warnings treated as errors, escape hatches requiring a written justification.</td>
+          <td><span class="tag t-no">Unrecoverable in practice</span> Nobody turns warnings-as-errors on against a year of existing code — the error count makes it a project, so it never happens.</td>
+        </tr>
+        <tr>
+          <td class="k">Shared config, plus a parity check</td>
+          <td>One place per language where every rule is expressed, and a job that fails when the two diverge. Projects extend; none redefine.</td>
+          <td>Each project grows its own config, they drift, and adding a rule becomes eight pull requests and an argument.</td>
+        </tr>
+        <tr>
+          <td class="k">The one-page practice standard</td>
+          <td>How we prompt, what context we share, what we check before accepting output. In version control, with a named owner.</td>
+          <td>Far cheaper to write while the team is small enough to agree. On a wiki it rots and is discovered to be fiction at the worst moment.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Six decisions that need a name against them</h3>
+  <p>Distinct from the settings above — these have no artifact. They are about ownership and authority, and they get settled before the team grows past one conversation.</p>
+
+  <ul>
+    <li><strong>Who owns quality.</strong> Every engineer owns it; the quality function owns the capability to deliver it, never the execution. State it <em>before</em> the first quality hire, because that job description sets the precedent permanently.</li>
+    <li><strong>The AI stance.</strong> What it may be used for, what review it needs, what data may go near it, who is accountable for accepting its output. Ambiguity is not neutral — people hedge, hide usage and over-rely, frequently all three.</li>
+    <li><strong>What is non-negotiable.</strong> The short list nobody may switch off. Everything else is a default that can be argued with.</li>
+    <li><strong>The boundary with legal and security.</strong> They own <em>what must be true</em>; engineering owns <em>how that is satisfied and enforced</em>. Settle it before the first tool is provisioned and it never becomes a dispute.</li>
+    <li><strong>What "high risk" means here.</strong> Written once, applied automatically.</li>
+    <li><strong>Where the standard lives.</strong> Version control, reviewed like code, named owner. Not a wiki page.</li>
+  </ul>
+</section>
+
+<!-- ==================== 02 ==================== -->
+<section id="unrecoverable">
+  <div class="sh">
+    <span class="eyebrow">Non-negotiable</span>
+    <h2>The four that cannot be added later</h2>
+    <p>Everything else on this page can be introduced in month six at moderate cost. These four cannot &mdash; <strong>two in principle, and two in practice</strong>, which is a distinction worth keeping because the second pair is technically reversible and never actually reversed.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Why each one is a one-way door</caption>
+      <thead><tr><th>Item</th><th>Why it cannot be retrofitted</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">Provenance at commit</td>
+          <td>History cannot be rewritten to add a fact nobody recorded. Every AI-specific measurement downstream depends on this existing — without it, "are AI-authored changes actually reviewed?" has no answer except a manual sample.</td>
+        </tr>
+        <tr>
+          <td class="k">Test results stored per run</td>
+          <td><strong>A test run that was never recorded is gone.</strong> Results living only in CI console output on a 30-day retention looks fine for a quarter, and then flaky rate, feedback time and mutation score are permanently unobtainable.</td>
+        </tr>
+        <tr>
+          <td class="k">Compiler strictness</td>
+          <td>Technically reversible, practically not. Enabling it against a year of code produces thousands of errors at the worst possible moment, so in every organisation that defers it, it never happens.</td>
+        </tr>
+        <tr>
+          <td class="k">Flag lifecycle rules</td>
+          <td>An owner and a removal date required at flag creation. Introducing this against two hundred existing flags means auditing two hundred flags, which nobody will do — and the release model depends on flags staying manageable.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>If only two survive contact with reality</h3>
+    <p><strong>Record provenance in the commit, and require human review on every change, from the first repository.</strong> Both are settings. Both are free today. Neither can be recovered cheaply once there is history — and every other AI-specific control depends on the first one existing.</p>
+  </div>
+</section>
+
+<!-- ==================== 03 ==================== -->
+<section id="stages">
+  <div class="sh">
+    <span class="eyebrow">Sequence</span>
+    <h2>The five stages</h2>
+    <p>Started by events rather than dates. Triggers are checkable — <em>does a second team exist? has there been an incident?</em> — so nobody has to litigate whether we are behind.</p>
+  </div>
+
+  <div class="stage">
+    <div class="stage-h">
+      <span class="sn">Stage 1</span>
+      <h3>Decide and fund</h3>
+      <span class="trig">Move on when: the first pipeline exists</span>
+    </div>
+    <div class="stage-b">
+      <p>Entirely conversation and contracts. Everything in section 01 above, plus the commercial groundwork: the model plan with per-user spend caps before any seat is issued, the data-processing agreement and retention settings, and legal confirmation on where staff may process what.</p>
+      <p><strong>Also here:</strong> the salvage review, timeboxed to three to five days. Assess domain knowledge, integrations, application code and infrastructure separately — they have different answers. And brief the component library if an external firm is building it, because vendor lead times are measured in months.</p>
+      <p><strong>Done when</strong> a repository created today inherits every one of these by default, with nobody remembering to apply them.</p>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-h">
+      <span class="sn">Stage 2</span>
+      <h3>Paved road, and instrument as you go</h3>
+      <span class="trig">Move on when: a second team appears, or the first incident</span>
+    </div>
+    <div class="stage-b">
+      <p>The minimum that makes every later step cheaper, and the point at which telemetry is emitted rather than excavated later.</p>
+      <ul>
+        <li><strong>Scaffold both halves of the codebase, strict, with boundaries enforced in each.</strong> This is the single most valuable hour in the plan — the strictness settings are what earn the language decision and they are effectively impossible to add later.</li>
+        <li><strong>The shared CI workflow, called rather than copied</strong>, before the first workflow gets copy-pasted. After that it is archaeology.</li>
+        <li><strong>The system overview</strong> — one page: what the services are, where data lives, which boundaries must not be crossed, what is deliberately undecided. The design stage reads this, so it exists before the first feature.</li>
+        <li><strong>Design tokens and the generation chain</strong>, before any component, with the contrast check wired from the first commit.</li>
+        <li><strong>The remaining shared homes, empty</strong>, each with an owner and a README saying what belongs in it.</li>
+        <li><strong>Telemetry on</strong>, pointed anywhere, even a free tier. History cannot be generated retroactively.</li>
+        <li><strong>Environments defined</strong>, with production carrying a required-reviewer rule from day one even while everything is manual.</li>
+        <li><strong>The synthetic dataset started</strong> — long lead time, and without a convincing one people eventually reach for real data.</li>
+      </ul>
+      <p><strong>Done when</strong> every metric can be answered without asking a person.</p>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-h">
+      <span class="sn">Stage 3</span>
+      <h3>One team runs the whole flow by hand</h3>
+      <span class="trig">Move on when: the rough edges are logged</span>
+    </div>
+    <div class="stage-b">
+      <p>Resist expanding here. You want the setup refined against reality before anyone else inherits its rough edges.</p>
+      <ul>
+        <li><strong>Pick the pilot team by throughput, not enthusiasm.</strong> Engineers with a baseline of two or more changes a week retained the tooling at materially higher rates. Seniority and stated enthusiasm predicted adoption but not retention.</li>
+        <li><strong>Ship the specification commands</strong> and run a real feature through the full lifecycle.</li>
+        <li><strong>Wire the scenarios to run as tests.</strong> Half a day, and it is the load-bearing step — without it the specification is documentation and drifts within a month. <a href="02-the-plan.html">Why that matters &rarr;</a></li>
+        <li><strong>Generate the reuse catalogue</strong> and make the discovery stage blocking.</li>
+        <li><strong>Size caps and test conventions</strong> in CI.</li>
+        <li><strong>Accessibility enforced</strong> — lint rules, automated assertions, and the token contrast gate.</li>
+        <li><strong>Error tracking</strong>, separately from metrics. They answer different questions and both are needed.</li>
+        <li><strong>Approve-by-summarising</strong>, and watch time-to-approve alongside change size.</li>
+        <li><strong>One command from a fresh clone to a running system.</strong> Write it while the pilot team still remembers what was undocumented.</li>
+      </ul>
+      <p><strong>Done when</strong> the pilot team would choose the paved road over going round it.</p>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-h">
+      <span class="sn">Stage 4</span>
+      <h3>Expand and enforce</h3>
+      <span class="trig">Move on when: about six months of incident history exists</span>
+    </div>
+    <div class="stage-b">
+      <p>Triggered by a second team, not by a date. Controls tighten because the risk profile changed, not because a quarter ended.</p>
+      <ul>
+        <li><strong>Onboard teams two and three socially.</strong> Let the pilot team do the persuading; make usage visible in review comments. Adoption spreads socially and mandates do not appear anywhere in the evidence.</li>
+        <li><strong>Ship the blocking hooks</strong> — a small named set informed by what actually went wrong in the pilot, not what you predicted. Each mirrors a CI check rather than replacing one.</li>
+        <li><strong>Report throughput and stability together, always.</strong> Merged changes and cycle time alongside change failure rate and two-week churn.</li>
+        <li><strong>Name a spend owner</strong> and run the first monthly review. One person, one slide: total, per engineer, per merged change, and what moved.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-h">
+      <span class="sn">Stage 5</span>
+      <h3>The autonomous pipeline</h3>
+      <span class="trig">Done when: headcount doubles and change failure rate doesn't move</span>
+    </div>
+    <div class="stage-b">
+      <p><strong>Only start once the flow works manually.</strong> Automating a process you have not run by hand automates your misunderstanding of it.</p>
+      <ul>
+        <li><strong>Declare the bounds before writing any stage</strong> — iteration cap, budget cap, a success function the agent can evaluate itself, an escalation path, and no-progress detection. The budget cap is two numbers: per stage, and accumulated per run.</li>
+        <li><strong>Build the shared stage harness first.</strong> If stages are written individually the bounds get implemented eleven times and eleven ways, and the one that gets skipped is the one that runs away.</li>
+        <li><strong>Wire triage first</strong> — the output is a comment, so it is fully reversible and the safest place to learn how headless agents behave.</li>
+        <li><strong>Then the rest, in reversibility order</strong>, each shadowed first and promoted only after a fortnight of being right. Reuse, then design and decomposition, then verification, then implementation, then staging, and production last.</li>
+        <li><strong>Build the reversibility stack before automating deployment.</strong> If automated reversal cannot be achieved, deployment stays a human gate — that is a legitimate outcome, it just needs deciding rather than discovering.</li>
+        <li><strong>The golden set</strong> — 15 to 20 recorded past requests with known-good outcomes, run nightly. Once agents run delivery, <strong>a prompt change is a production change.</strong></li>
+        <li><strong>Register the pipeline as a non-human identity</strong> — least privilege, credential rotation, audit logging. It is a service account with production access.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">The ordering mistake to avoid</span>
+    <p>Every one of these stages is tempting to start early, and stage 5 is the most tempting of all because it is the interesting one. <strong>Automating a workflow nobody has run manually produces a fast, confident version of the wrong process</strong> — and because it is automated, the wrongness is now consistent and hard to see.</p>
+  </div>
+</section>
+
+  <section id="roadmap">
+    <div class="sh">
+      <span class="eyebrow">The roadmap</span>
+      <h2>Forty-eight steps, in dependency order</h2>
+      <p>Ordered so each one's prerequisites are already done. The <em>why here</em> column is the part worth reading &mdash; it is what stops the order being rearranged for convenience.</p>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">Read the transition steps first</span>
+      <p>Steps marked <span class="tag t-open">Transition</span> exist because <strong>this is not a greenfield build.</strong> There is a live product with clinicians using it, an existing codebase, and a working way of doing things. A plan that only describes the new system is a plan for a company that does not exist yet.</p>
+      <p>Those steps are the difference between a proposal and something you can start on Monday.</p>
+    </div>
+
+    <h3>Stage 1 &middot; Decide and fund</h3>
+    <p class="stagenote">Nothing else starts until these land. All conversation and contracts &mdash; no code.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>Steps 1&ndash;13 &middot; before the first commit</caption>
+        <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr><td class="n">01</td><td class="k">Count the application repositories <span class="tag t-open">Transition</span></td><td>48 repos is mostly infrastructure. The number that matters is how many hold application code and how many survive the salvage review &mdash; almost certainly single digits, which makes everything downstream easier.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">02</td><td class="k">Salvage review, timeboxed <span class="tag t-open">Transition</span></td><td>Assess domain knowledge, integrations, application code and infrastructure <strong>separately</strong> &mdash; they have different answers. This can absorb a month if you let it; three to five days with a written recommendation per layer.</td><td class="n">3&ndash;5 days</td></tr>
+          <tr><td class="n">03</td><td class="k">Decide the coexistence model &mdash; product <em>and</em> workflow <span class="tag t-open">Transition</span></td><td><strong>Two things run in parallel during transition, not one, and the step most likely to be skipped.</strong><br><br><b>The product:</b> clinicians keep using what exists throughout. Decide which system owns which capability, how they share data, and what cutover looks like per capability rather than as one event.<br><br><b>The workflow:</b> there is a working agentic pipeline doing real work today. It does not get switched off to build its replacement &mdash; capability moves across one piece at a time, in the same reversibility order everything else follows.</td><td class="n">2 days</td></tr>
+          <tr><td class="n">04</td><td class="k">Inventory the existing agentic assets <span class="tag t-open">Transition</span></td><td>An orchestrator, three coordinators, roughly seventeen specialists, plus skills, instructions and work-packet templates already exist and are running. <strong>The concepts port; the files do not</strong> &mdash; formats differ, invocation differs, and the delegation behaviour is configured differently.<br><br>Triage into three piles: <b>carry the design</b> (orchestrator-first, coordinators that stop when scope is unclear, artifacts over conversation &mdash; all of it good and worth keeping) &middot; <b>rewrite the file</b> &middot; <b>drop it</b>. Doing this now means the rebuild starts from accumulated learning rather than from nothing.</td><td class="n">2 days</td></tr>
+          <tr><td class="n">05</td><td class="k">Settle the monorepo as destination, not migration</td><td>Old repositories die as their code is replaced or retired. Creating the target now delivers whole-system visibility immediately; a consolidation project delivers it in six months.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">06</td><td class="k">Name one owning team per module</td><td>Free on day one, near-impossible to retrofit socially. If two teams both need to own something, the boundary is wrong &mdash; fix the boundary.</td><td class="n">Free</td></tr>
+          <tr><td class="n">07</td><td class="k">Decide where an ask originates <span class="tag t-open">Transition</span></td><td>Product intent already lives somewhere. Decide whether that stays the front door with the pipeline reading from it, or whether intake moves &mdash; and <strong>write down which system is authoritative for what</strong>, because two systems knowing the same fact is the failure this plan warns about everywhere else.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">08</td><td class="k">Design the label taxonomy</td><td>Labels are the pipeline's state machine, not decoration. Invented later means migrating every open item.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">09</td><td class="k">Sign the model plan; set per-user caps before any seat</td><td>Never pilot on a flat rate and convert later &mdash; you want the cost signal present while habits form. This is the control whose absence ended a 5,000-engineer programme elsewhere.</td><td class="n">Days</td></tr>
+          <tr><td class="n">10</td><td class="k">Data agreement and retention settings</td><td>Two separate actions, both required, neither automatic. Then write down what the coverage actually excludes, because it is narrower than people assume.</td><td class="n">Days</td></tr>
+          <tr><td class="n">11</td><td class="k">Legal position on where staff process what</td><td>A cheap email now, an awkward discovery once a team is hired and working.</td><td class="n">One email</td></tr>
+          <tr><td class="n">12</td><td class="k">Brief the component library, if external</td><td>Vendor lead times run to months, and every delivery condition is far cheaper to ask for than to retrofit. Contrast proven across the token set is the one most often missed.</td><td class="n">2 days</td></tr>
+          <tr><td class="n">13</td><td class="k">Publish what is non-negotiable</td><td>The short list nobody may switch off. Writing it down stops it being re-litigated in every subsequent meeting.</td><td class="n">An hour</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Stage 2 &middot; Paved road</h3>
+    <p class="stagenote">The minimum that makes every later step cheaper. <strong>Move on when a second team appears or the first incident happens.</strong></p>
+
+    <div class="scroll">
+      <table>
+        <caption>Steps 14&ndash;25 &middot; foundations and instrumentation</caption>
+        <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr><td class="n">14</td><td class="k">Branch protection, review required, bypass decided</td><td>The highest-return control available, for one setting. <strong>Decide the low-lane bypass now</strong> rather than discovering in month two that two absolute rules are incompatible.</td><td class="n">An hour</td></tr>
+          <tr><td class="n">15</td><td class="k">Provenance trailer plus the check</td><td><span class="tag t-no">Unrecoverable</span> Cannot be backfilled, and every AI-specific measurement downstream depends on it. Check the merge strategy, not just the branch commits.</td><td class="n">An hour</td></tr>
+          <tr><td class="n">16</td><td class="k">The telemetry contract &mdash; three joins</td><td><span class="tag t-no">Unrecoverable</span> Deploys carry the commit, incidents carry the deploy, test results stored per run. The third one especially: a run never recorded is gone.</td><td class="n">A day</td></tr>
+          <tr><td class="n">17</td><td class="k">Scaffold the repository, strict, boundaries enforced</td><td><strong>The single most valuable hour in the plan.</strong> Nobody turns warnings-as-errors on against a year of existing code, so in practice it is now or never. Build the config parity check in the same sitting.</td><td class="n">2&ndash;3 days</td></tr>
+          <tr><td class="n">18</td><td class="k">Shared CI workflow, called not copied</td><td>Must exist <em>before</em> the first workflow gets pasted. After that it is archaeology across N repositories. Pin callers to a tag, never a branch.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">19</td><td class="k">Risk lanes wired to path-based routing</td><td>Review capacity is the binding constraint, so spending it uniformly spends it badly. Doing this before the first feature means the pattern is established rather than retrofitted.</td><td class="n">An hour</td></tr>
+          <tr><td class="n">20</td><td class="k">The system overview &mdash; one page</td><td>The design stage reads this, so it exists before the first feature. Services, where data lives, boundaries that must not be crossed, and <strong>what is deliberately undecided</strong> so an agent proposes rather than assumes.</td><td class="n">An hour</td></tr>
+          <tr><td class="n">21</td><td class="k">Design tokens and the generation chain</td><td>Before any component &mdash; one built against a hand-written colour is one to redo. Stand it up with placeholder values if the palette is not ready; the pipeline matters more than the values on day one.</td><td class="n">A day</td></tr>
+          <tr><td class="n">22</td><td class="k">The remaining shared homes, empty</td><td>The destination has to exist before the first shared thing is written, or it lands in a feature folder and is invisible forever. Each with an owner and a README saying what belongs there.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">23</td><td class="k">Environments, with production gated from day one</td><td>Almost impossible to retrofit once things are deployed. The required-reviewer rule wants setting while it costs nothing &mdash; adding a gate later reads as distrust.</td><td class="n">A day</td></tr>
+          <tr><td class="n">24</td><td class="k">Telemetry on, pointed anywhere</td><td>Free, and history cannot be generated retroactively. Content logging stays off.</td><td class="n">Free</td></tr>
+          <tr><td class="n">25</td><td class="k">Start the synthetic dataset</td><td>Long lead time. Without a convincing one, people eventually reach for real data and no automated guard catches every route.</td><td class="n">Ongoing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Stage 3 &middot; One team runs the flow by hand</h3>
+    <p class="stagenote">Resist expanding. <strong>Move on when the rough edges are logged and the pilot team would choose the paved road over going round it.</strong></p>
+
+    <div class="scroll">
+      <table>
+        <caption>Steps 26&ndash;35 &middot; prove it once, manually</caption>
+        <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr><td class="n">26</td><td class="k">Pick the pilot team by throughput, not enthusiasm</td><td>A baseline of two or more changes a week predicted retention; seniority and stated enthusiasm predicted adoption but not retention. Pick a team whose success is visible to others.</td><td class="n">A conversation</td></tr>
+          <tr><td class="n">27</td><td class="k">Ship the specification commands</td><td>The grammar makes vagueness ungrammatical &mdash; you cannot write "handles errors gracefully" because the template demands a named trigger, system and response.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">28</td><td class="k">Wire the scenarios to run as tests</td><td><strong>The load-bearing step.</strong> Without it the specification is documentation and drifts within a month. With it, the scenario product approved <em>is</em> the test gating production. Set sharding and scope rules in the same sitting. <strong>Feature files are organised by capability, never by change</strong> &mdash; a change adds a scenario to the file that already exists, or you end up with two hundred issue-named files and no way to know what covers what.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">29</td><td class="k">Requirement IDs traceable end to end</td><td><strong>This is the drift detector</strong>, and it is what makes disposable specs safe. The ID travels from the spec to a tag on the scenario that proves it to the commit trailer &mdash; so "why does it behave this way" resolves back to the issue that introduced it, and a requirement with no test referencing it is a query rather than a mystery.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">30</td><td class="k">Generate the reuse catalogue; make discovery blocking</td><td>Duplication rose 81% and cross-file reuse fell 35% across 623 million AI-assisted changes, because new code is always the path of least resistance. An advisory reminder does not change that; a stage that fails on an unjustified "new" does.</td><td class="n">1&ndash;2 days</td></tr>
+          <tr><td class="n">31</td><td class="k">Size caps and test conventions in CI</td><td>Agents will happily produce a 2,000-line diff nobody can meaningfully review, and agent-opened changes already wait 5.3&times; longer to be picked up.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">32</td><td class="k">Accessibility enforced in CI</td><td>Lint rules, automated assertions, and the token contrast gate. <strong>Note what this does not do:</strong> it catches the mechanically detectable violations, which is most of the volume. It does not establish conformance &mdash; budget a manual audit separately.</td><td class="n">A day</td></tr>
+          <tr><td class="n">33</td><td class="k">Error tracking, separately from metrics</td><td>They answer different questions. Metrics tell the release process <em>that</em> the error rate rose, which is enough to roll back; this tells you <em>why</em>, which is what stops it recurring.</td><td class="n">An hour</td></tr>
+          <tr><td class="n">34</td><td class="k">Approve-by-summarising, and one-command onboarding</td><td>Thirty seconds, impossible to fake without reading the change. And write the onboarding while the pilot team still remembers what was undocumented &mdash; that knowledge evaporates within weeks.</td><td class="n">A day</td></tr>
+          <tr><td class="n">35</td><td class="k">Start the architecture forum and the known-bad list</td><td><strong>The collective work has to have a home or it does not happen.</strong> A weekly hour where the system-level problems that are nobody&rsquo;s ticket get decided &mdash; buy or build, failure behaviour, where a new concept lives &mdash; producing decision records rather than tasks. And a standing retrospective question: <em>what did the tooling get wrong this time?</em><br><br>The answer becomes a list the agent loads before generating, so it changes what gets written next rather than being a discussion. <strong>Every engineer derives this list privately within weeks and none of them share it</strong> &mdash; writing it down is the cheapest compounding asset here.</td><td class="n">Recurring</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Stage 4 &middot; Expand and enforce</h3>
+    <p class="stagenote">Triggered by a second team, not by a date. <strong>Move on when roughly six months of incident history exists.</strong></p>
+
+    <div class="scroll">
+      <table>
+        <caption>Steps 36&ndash;39 &middot; scale the practice</caption>
+        <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr><td class="n">36</td><td class="k">Onboard teams two and three socially</td><td>Let the pilot team do the persuading; make usage visible in review comments. Adoption spreads socially and mandates do not appear anywhere in the evidence as a predictor of retention.</td><td class="n">Weeks</td></tr>
+          <tr><td class="n">37</td><td class="k">Ship the blocking hooks &mdash; a small named set</td><td>Informed by what actually went wrong in the pilot, not what you predicted. Each mirrors a CI check rather than replacing one. <strong>The failure mode is a cage tight enough that people route around it</strong> and you lose both productivity and visibility.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">38</td><td class="k">Report throughput and stability together, always</td><td>AI adoption reliably raises throughput while degrading stability &mdash; the documented default trajectory, not a hypothetical. Reporting one without the other hides the cost.</td><td class="n">A day</td></tr>
+          <tr><td class="n">39</td><td class="k">Name a spend owner; run the first monthly review</td><td>Per-user caps stop runaway <em>incidents</em>; only a person looking monthly catches gradual drift, and drift is the shape this actually fails in.</td><td class="n">Recurring</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Stage 5 &middot; Automate the pipeline</h3>
+    <p class="stagenote"><strong>Only once the flow works manually.</strong> Automating a process nobody has run by hand produces a fast, confident version of the wrong process.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>Steps 40&ndash;48 &middot; the autonomous pipeline</caption>
+        <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr><td class="n">40</td><td class="k">Declare the bounds before writing any stage</td><td>Iteration cap, budget cap, a success function the agent evaluates itself, an escalation path, no-progress detection. <strong>The budget cap is two numbers</strong> &mdash; per stage and accumulated per run &mdash; because per-stage caps do not bound a feature.</td><td class="n">An hour</td></tr>
+          <tr><td class="n">41</td><td class="k">Build the shared stage harness first</td><td>Written individually, the bounds get implemented eleven times and eleven ways, and the one that gets skipped is the one that runs away.</td><td class="n">2&ndash;3 days</td></tr>
+          <tr><td class="n">42</td><td class="k">Give the run an owner and a close <span class="tag t-info">New</span></td><td><strong>Currently missing from this design.</strong> Stages are independent jobs triggered by labels, so nothing is accountable for a piece of work end to end &mdash; it can stall between stages and nothing notices. One orchestrating step holds the run identifier, enforces the gates in order, and <strong>closes with a summary</strong>. That summary is also the traceability record.</td><td class="n">2 days</td></tr>
+          <tr><td class="n">43</td><td class="k">Add the ambiguity path <span class="tag t-info">New</span></td><td><strong>Also missing.</strong> Triage currently classifies confidently every time. When the ask is genuinely unclear the correct behaviour is to stop and ask a person, not to guess well. Failing to ask for clarification is <strong>6.8% of observed agent failures</strong> &mdash; thirteen times more common than the role-confusion failure this plan spends a section arguing about.</td><td class="n">A day</td></tr>
+          <tr><td class="n">44</td><td class="k">Bound each stage to its approved scope <span class="tag t-info">New</span></td><td>The approved plan defines which paths may be touched, and the harness enforces it rather than trusting the agent to stay inside. Scope creep then fails a check instead of arriving in review.</td><td class="n">A day</td></tr>
+          <tr><td class="n">45</td><td class="k">Add the durable-document decision point <span class="tag t-info">New</span></td><td>Durable artifacts &mdash; the system overview, the decision records &mdash; have no update trigger in this design, which is how they quietly go stale. Every run asks one question before closing: <em>did this change platform truth?</em> If yes, updating is in scope and someone decides. If no, it is explicitly out of scope and nobody touches it.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">46</td><td class="k">Wire triage first, then the rest in reversibility order</td><td>Triage produces a comment, so it is fully reversible &mdash; the safest place to learn how headless agents behave. Then reuse, design, decomposition, verification, implementation, staging, and production last. Each shadowed first, promoted after a fortnight of being right.</td><td class="n">Weeks</td></tr>
+          <tr><td class="n">47</td><td class="k">Build the reversibility stack before automating deployment</td><td>Autonomous deployment is not about trusting the agent &mdash; it is about making being wrong cheap. <strong>If automated reversal cannot be achieved, deployment stays a human gate.</strong> That is a legitimate outcome; it just needs deciding rather than discovering.</td><td class="n">The real work</td></tr>
+          <tr><td class="n">48</td><td class="k">The golden set, plus register the pipeline as an identity</td><td>Once agents run delivery, <strong>a prompt change is a production change</strong> &mdash; editing the reviewer's instructions alters the quality gate on every change in the company. And a pipeline with commit and deploy rights is a service account with production access.</td><td class="n">2 days</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="verdict">
+      <h3>The four steps that carry the most weight</h3>
+      <p><strong>17 &mdash; strictness settings.</strong> Effectively impossible later, and it is what earns the whole compiler argument.</p>
+      <p><strong>15 and 16 &mdash; provenance and the telemetry joins.</strong> Free today, unrecoverable tomorrow, and everything measurable downstream depends on them.</p>
+      <p><strong>28 &mdash; scenarios running as tests.</strong> Half a day, and every claim this plan makes about specifications not drifting rests on it.</p>
+      <p>If a quarter goes badly and only four things got done, those four leave you in a recoverable position. <strong>Nothing else on this list is unrecoverable.</strong></p>
+    </div>
+
+    <div class="note">
+      <span class="lbl">On the steps marked new</span>
+      <p>Steps 42, 43 and 45 were not in the original plan. They came from reading an existing agentic workflow already running elsewhere in the business, which solves all three and which this design had simply not considered &mdash; run ownership with an explicit close, a path for ambiguous requests, and a decision point for whether durable documentation needs updating.</p>
+      <p><strong>Worth saying plainly: that workflow is ahead of this plan on those three points.</strong> Taking them is not a compromise, it is the obvious move.</p>
+    </div>
+  </section>
+
+
+
+<!-- ==================== 04 ==================== -->
+<section id="standards">
+  <div class="sh">
+    <span class="eyebrow">The bar</span>
+    <h2>The standards, and what enforces each</h2>
+    <p>Grouped by what they protect. Every one has a machine behind it — a rule nobody enforces is a preference.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Twenty-five standards, by what they defend</caption>
+      <thead><tr><th>Group</th><th>The standards</th><th>Enforced by</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">Review is real<br><span style="font-weight:400;color:var(--ink-faint)">4 standards</span></td>
+          <td>Human review on every change · review is substantive, not a click · provenance recorded · risk decides process depth</td>
+          <td>Branch protection · a written-sentence requirement checked in CI · a commit trailer check · path-based routing</td>
+        </tr>
+        <tr>
+          <td class="k">The code stays coherent<br><span style="font-weight:400;color:var(--ink-faint)">5 standards</span></td>
+          <td>Does it already exist? · one definition per fact · no fifteenth version of a button · type safety at every boundary · comments describe code that exists</td>
+          <td>A blocking reuse stage plus a duplication threshold · CI failing on stale generated output · lint rules on raw elements · strict compilers with justified escape hatches · a custom lint rule</td>
+        </tr>
+        <tr>
+          <td class="k">Tests mean something<br><span style="font-weight:400;color:var(--ink-faint)">6 standards</span></td>
+          <td>The testing contract · tests prove behaviour · coverage means something · test data is isolated · flakes are quarantined with an expiry · results are retained</td>
+          <td>A loaded skill plus a suite time budget · assertion-density sampling and a hook blocking test edits during implementation · mutation scoring on sensitive paths · a test data service · flake detection · the result storage schema</td>
+        </tr>
+        <tr>
+          <td class="k">Nothing dangerous ships<br><span style="font-weight:400;color:var(--ink-faint)">6 standards</span></td>
+          <td>No secrets or real data anywhere · data classification respected · security scanning weighted to how AI fails · dependencies are vetted · usable by our members · no irreversible data change</td>
+          <td>Secret scanning plus a personal-data-shaped scan and blocking hooks · a tool allowlist · a tuned ruleset plus a dedicated security reviewer · a provenance check on new dependencies · lint rules, automated assertions and a token contrast gate · destructive migrations blocked without an explicit label</td>
+        </tr>
+        <tr>
+          <td class="k">The machinery stays sane<br><span style="font-weight:400;color:var(--ink-faint)">4 standards</span></td>
+          <td>Agents cannot run away · the telemetry contract · local matches CI · non-functional checks have a home</td>
+          <td>The shared stage harness · a schema decision enforced by the pipeline that writes it · containerised runner parity · a reserved CI stage, defined while still empty</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="lbl">The test before adding a twenty-sixth</span>
+    <p><strong>Does complying with this cost an engineer anything?</strong> If not, mandate it today and never discuss it again — that is a control. If it does, it is a practice, and practices are earned rather than announced.</p>
+    <p>And the second test: <strong>does it prevent a defect class or shorten a feedback loop?</strong> If neither, it is ceremony. Remove it rather than refining it.</p>
+  </div>
+</section>
+
+<!-- ==================== 05 ==================== -->
+<section id="tests">
+  <div class="sh">
+    <span class="eyebrow">The testing contract</span>
+    <h2>What proves what</h2>
+    <p>The most common question a new engineer or an agent asks, and the one most codebases never answer — so everything drifts to end-to-end.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Build this, prove it this way</caption>
+      <thead><tr><th>You're building</th><th>Default proof</th><th>Budget</th><th>Also required</th></tr></thead>
+      <tbody>
+        <tr><td class="k">A pure function or formatter</td><td>Unit, in memory</td><td class="n">&lt; 10ms</td><td>Nothing. If it needs more than this, it is not pure — move it.</td></tr>
+        <tr><td class="k">A domain rule</td><td>Unit, valid and invalid cases both</td><td class="n">&lt; 10ms</td><td>Every rule ships with at least one rejection test.</td></tr>
+        <tr><td class="k">A boundary validator</td><td>Unit, valid and invalid both</td><td class="n">&lt; 10ms</td><td>A validator nobody tested against bad input is decoration.</td></tr>
+        <tr><td class="k">A UI component</td><td>In-memory render, queried by role</td><td class="n">&lt; 100ms</td><td>An accessibility assertion on anything interactive.</td></tr>
+        <tr><td class="k">An API endpoint</td><td>Integration, against a real database in a container</td><td class="n">&lt; 2s</td><td><strong>An authorisation test for every endpoint touching member data. No exceptions</strong> — this is the row that catches the most common serious finding in AI-written code.</td></tr>
+        <tr><td class="k">A cross-service call</td><td>Contract test — consumer records, provider verifies</td><td class="n">&lt; 1s</td><td>Breaking-change detection on the published schema.</td></tr>
+        <tr><td class="k">A database migration</td><td>Up and down against a restored snapshot</td><td class="n">&lt; 30s</td><td>Proof the previous version still starts against the new schema.</td></tr>
+        <tr><td class="k">A user journey</td><td>End to end, driving the approved scenario</td><td class="n">&lt; 30s</td><td>One per acceptance scenario. Not one per component, not one per route.</td></tr>
+        <tr><td class="k">Anything on a sensitive path</td><td>All of the above, plus mutation testing</td><td class="n">Nightly</td><td>Coverage means nothing without it, and generated tests inflate coverage while asserting little.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>A test may only sit at a higher layer if it cannot be written at a lower one</h3>
+    <p>The reviewer's question is never "is this tested?" but <strong>"is this tested <em>here</em>, and why not lower?"</strong></p>
+    <p>The suite has a hard budget: ten minutes end to end. When it exceeds that, the fix is moving tests down the pyramid or running only what a change affects — never deleting coverage, and never accepting a slower loop.</p>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">The collision to plan for now, not later</span>
+    <p>Every acceptance scenario needs an end-to-end test, and none can move down the pyramid — being end to end is what makes it the contract. At roughly thirty seconds each, <strong>ten minutes of serial execution is about twenty scenarios</strong>, which a team shipping two or three a feature reaches within months.</p>
+    <p>Resolve it in advance: shard across CI workers, run only the scenarios a change touches on a pull request, run everything on merge and nightly. <strong>The ten minutes is a promise about the pull-request loop, not a cap on how many scenarios may exist</strong> — say it that way, because said the other way it eventually becomes an argument for having fewer acceptance tests.</p>
+  </div>
+</section>
+
+<!-- ==================== 06 ==================== -->
+<section id="where">
+  <div class="sh">
+    <span class="eyebrow">Enforcement</span>
+    <h2>Where a rule can live</h2>
+    <p>Four places, ordered by how binding each is. Choosing the wrong one is the difference between a standard that holds and one described in an onboarding session and then forgotten.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Ordered by bindingness</caption>
+      <thead><tr><th>Mechanism</th><th>Use it for</th><th>Weakness</th></tr></thead>
+      <tbody>
+        <tr><td class="k">A CI check</td><td>Anything objectively decidable. <strong>The default — if a rule can live here, it lives here.</strong></td><td>Feedback arrives minutes after the mistake rather than at the moment of it.</td></tr>
+        <tr><td class="k">A hook</td><td>Things that must never happen at all: real data entering the repository, tests edited to make them pass, pushing straight to the main branch.</td><td>Local only. <strong>Every hook mirrors a CI check, never replaces one</strong> — a hook alone is bypassable.</td></tr>
+        <tr><td class="k">A loaded skill</td><td>Things requiring judgement applied consistently: which test type to write, how to structure a component, what the tooling is bad at here.</td><td>Advisory. It shapes what gets produced; it cannot guarantee it.</td></tr>
+        <tr><td class="k">An instruction file</td><td><strong>Almost nothing.</strong> Only what is true of every task in the repository, in a few lines.</td><td>Costs tokens every session, and adherence falls as it grows — a long file causes rules <em>inside it</em> to be ignored.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>Move rules down this list, not up</h3>
+    <p>The instinct when a standard is missed is to write it down more prominently. That is moving <em>up</em> — toward prose, toward advisory, toward decay. <strong>The fix is always the opposite:</strong> can this be a skill, so the agent applies it by default? Can it be a CI check, so it is decided rather than debated?</p>
+    <p>This also resolves the tension between context budget and standards. Every rule moved out of prose and into a check costs zero tokens <em>and</em> becomes binding — so shrinking the instruction file strengthens enforcement rather than weakening it.</p>
+  </div>
+
+  <div class="note good">
+    <span class="lbl">Why skills matter more than they look</span>
+    <p>A CI check catches a mistake <em>after</em> it is made. A skill means the mistake is less likely to be made at all. <strong>They are the same standard expressed twice, deliberately</strong> — the skill makes the right thing the default output, the check makes the wrong thing impossible to merge. Skills without checks decay silently; checks without skills produce a loop where the agent generates, fails and retries.</p>
+  </div>
+</section>
+
+<!-- ==================== 07 ==================== -->
+<section id="decay">
+  <div class="sh">
+    <span class="eyebrow">Risk register</span>
+    <h2>How this rots, and the early warning</h2>
+    <p>Every one of these has happened to someone. The value is in the leading indicator — by the time the failure is obvious it is expensive.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Failure, signal, response</caption>
+      <thead><tr><th>Failure</th><th>Early warning</th><th>Response</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">Cost becomes indefensible</td>
+          <td>Spend per active day rising while merged changes stay flat. Cache-hit share of tokens falling.</td>
+          <td>Check what is churning at the top of the context — an instruction file changing mid-session invalidates the cache and you pay full price every turn. Then per-user caps, then conversations with specific heavy users.</td>
+        </tr>
+        <tr>
+          <td class="k">The review queue collapses</td>
+          <td>Pickup time rising. Change size distribution widening. Work in progress climbing while merges stay flat.</td>
+          <td>Tighten the size cap before adding reviewers. Move more baseline checks off human eyes. <strong>Do not add parallelism</strong> — it multiplies input to the constraint.</td>
+        </tr>
+        <tr>
+          <td class="k">Quality erodes invisibly</td>
+          <td>Two-week churn rising. Duplication rising. Revert rate up while throughput looks excellent.</td>
+          <td>This is the documented default trajectory, not bad luck. Raise the lane of whatever is churning, and check whether reviewers are approving without reading — a pre-reviewed change makes rubber-stamping easy.</td>
+        </tr>
+        <tr>
+          <td class="k">People route around the tooling</td>
+          <td>Hook overrides appearing frequently. Hooks disabled locally. Usage dropping among strong engineers specifically.</td>
+          <td>You have built a cage. <strong>Remove hooks rather than adding them</strong>, and find out what was blocked that should not have been. Losing visibility is worse than the risk you were guarding.</td>
+        </tr>
+        <tr>
+          <td class="k">Review becomes approval</td>
+          <td>Approvals landing within two minutes of a change opening. No comments on non-trivial changes.</td>
+          <td>Nobody announces that reviews have stopped being real. A blind audit twice a year — twenty changes, two judges, four criteria — answers it in half a day.</td>
+        </tr>
+        <tr>
+          <td class="k">The specification gate turns ceremonial</td>
+          <td>Scenarios written in technical language. Product approving within minutes and never asking for changes.</td>
+          <td>The gate is already dead. <strong>Fix the language, not the process</strong> — if product cannot evaluate it, they are not reviewing it, and you have lost the cheapest quality intervention available.</td>
+        </tr>
+        <tr>
+          <td class="k">An irreversible data change ships</td>
+          <td>A migration without a contract-phase label. Destructive operations outside a contract release. Rollback drills failing at the database step.</td>
+          <td><strong>The most dangerous failure here, because it silently voids the whole reversibility argument.</strong> The canary reports healthy — nothing was reading the dropped column yet — and rollback then cannot start the previous version. Rehearse a rollback against a restored snapshot quarterly; a rollback path nobody has run is a hypothesis.</td>
+        </tr>
+        <tr>
+          <td class="k">Flags accumulate</td>
+          <td>Flags past their removal date. Nobody able to say which combinations are live.</td>
+          <td>The cleanup rule was advisory rather than a build failure. Make it fail, and separate temporary release flags from permanent operational switches — mixing them is how the rule gets abandoned.</td>
+        </tr>
+        <tr>
+          <td class="k">Nobody can explain what is automated</td>
+          <td>Disagreement about whether a lane is gated. Autonomy levels not written down anywhere current.</td>
+          <td>Publish the levels with a named owner per lane. A silent demotion after an incident is how this erodes — make every change visible, with a stated reason and a route back.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">The signal that matters more than the others</span>
+    <p><strong>Escaped defects climbing as headcount grows, while every control reports green.</strong> The controls are measuring the wrong thing. Say so publicly rather than quietly adding another one — and note this is precisely the case the telemetry contract exists to make visible early rather than late.</p>
+  </div>
+</section>
+
+<!-- ==================== 08 ==================== -->
+<section id="not">
+  <div class="sh">
+    <span class="eyebrow">Deliberately excluded</span>
+    <h2>What not to build yet</h2>
+    <p>Each of these is defensible later and wrong now. Naming them stops them being rediscovered as good ideas every quarter.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Defer until the pain is real</caption>
+      <thead><tr><th>Thing</th><th>Wait until</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Parallel agent sessions per developer</td><td>Review throughput demonstrably has headroom. Running several sessions each multiplies input to the constraint — this is the clearest "do not" in the whole plan.</td></tr>
+        <tr><td class="k">Centrally managed device policy</td><td>There is an endpoint estate, or a compliance requirement forces it. Below that it is overhead that reads as distrust.</td></tr>
+        <tr><td class="k">Role-based agent teams</td><td><strong>Never, for coding.</strong> Optimises 0.5% of observed failures at roughly 15× the token cost.</td></tr>
+        <tr><td class="k">A separate review lane for AI-written code</td><td><strong>Never.</strong> Authorship is not detectable or attestable, so it is enforced by honesty and penalises it — and within a year everything is agent-assisted anyway.</td></tr>
+        <tr><td class="k">Specification ceremony on low-risk changes</td><td><strong>Never.</strong> That is the entire point of lanes.</td></tr>
+        <tr><td class="k">Paid observability</td><td>Free tiers cover a team this size comfortably.</td></tr>
+        <tr><td class="k">A release confidence score</td><td>Everything it would synthesise is real and trusted. Built early it produces a number nobody believes — and then the gate comes back wearing a dashboard.</td></tr>
+        <tr><td class="k">Self-hosted models</td><td>Spend is stable enough to forecast against a modelled workload. Keep the three interfaces abstract and the option stays cheap.</td></tr>
+        <tr><td class="k">A spec dependency graph</td><td><strong>Never, if specs are sized per change.</strong> The graph problem is an artefact of durable area-specs. Size them right and it does not arise.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>If only three things get done</h3>
+    <p><strong>One owning team per module.</strong> Free now, near-impossible to retrofit socially.</p>
+    <p><strong>The shared CI workflow, before the first copy-paste.</strong> The moment one gets pasted, drift begins and never stops.</p>
+    <p><strong>Cost controls before the first seat.</strong> The best-documented failure in this space is an organisation that measured a real productivity gain and cancelled anyway.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Document 03 of 03 · The Evidence (01) is why · The Plan (02) is what and how much · Full step-by-step detail, with ready-to-paste prompts and verification steps for each, remains in the original plan and is searchable</p>
+</footer>
+
+</div>
+</body>
+</html>

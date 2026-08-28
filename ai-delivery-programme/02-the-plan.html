@@ -1,0 +1,1489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>The Plan</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#F1F0ED; --surface:#FFFFFF; --sunk:#E7E5E1;
+    --ink:#1A1A1E; --ink-soft:#4A4A54; --ink-faint:#6A6A76;
+    --rule:#D8D6D2; --rule-soft:#E6E4E0;
+    --accent:#1F4E79; --accent-soft:#DEE8F1;
+    --good:#2C6446; --good-soft:#DCEAE1;
+    --warn:#8A5A15; --warn-soft:#F3E7D3;
+    --crit:#93313A; --crit-soft:#F4DFE1;
+
+    --display:'Newsreader',Georgia,'Times New Roman',serif;
+    --body:'Libre Franklin','Helvetica Neue',Helvetica,Arial,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --measure:68ch;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#14151A; --surface:#1C1D24; --sunk:#23252E;
+      --ink:#E8E8EE; --ink-soft:#AFB1BD; --ink-faint:#8D90A0;
+      --rule:#2E313B; --rule-soft:#262932;
+      --accent:#6FA8DC; --accent-soft:#152532;
+      --good:#6FBE95; --good-soft:#152720;
+      --warn:#D6A55A; --warn-soft:#2A2214;
+      --crit:#DE858D; --crit-soft:#2C1A1C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#14151A; --surface:#1C1D24; --sunk:#23252E;
+    --ink:#E8E8EE; --ink-soft:#AFB1BD; --ink-faint:#8D90A0;
+    --rule:#2E313B; --rule-soft:#262932;
+    --accent:#6FA8DC; --accent-soft:#152532;
+    --good:#6FBE95; --good-soft:#152720;
+    --warn:#D6A55A; --warn-soft:#2A2214;
+    --crit:#DE858D; --crit-soft:#2C1A1C;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--body); font-size:17px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:940px; margin:0 auto; padding:0 26px 110px;}
+
+  /* ---------- family strip ---------- */
+  .family{
+    display:flex; flex-wrap:wrap; gap:0; border-bottom:1px solid var(--rule);
+    margin:0 -26px; padding:0 26px; background:var(--surface);
+  }
+  .family a, .family span{
+    font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.09em;
+    text-transform:uppercase; padding:13px 18px 12px; text-decoration:none;
+    color:var(--ink-faint); border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .family .here{color:var(--accent); border-bottom-color:var(--accent); font-weight:600;}
+  .family a:hover{color:var(--ink);}
+  .family a:focus-visible{outline:2px solid var(--accent); outline-offset:-3px;}
+  .family .soon{opacity:.5;}
+
+  /* ---------- masthead ---------- */
+  .mast{padding:56px 0 34px; border-bottom:2px solid var(--ink); margin-bottom:0;}
+  .mast .num{
+    font-family:var(--mono); font-size:11.5px; font-weight:600; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--accent); margin:0 0 16px;
+  }
+  .mast h1{
+    font-family:var(--display); font-weight:600; font-size:clamp(38px,6.5vw,62px);
+    line-height:1.02; letter-spacing:-.02em; margin:0 0 20px; max-width:15ch;
+    text-wrap:balance;
+  }
+  .mast .sf{font-size:19px; line-height:1.55; color:var(--ink-soft); max-width:58ch; margin:0;}
+  .mast .meta{
+    display:flex; flex-wrap:wrap; gap:7px 22px; margin-top:22px;
+    font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.04em;
+  }
+
+  /* ---------- contents ---------- */
+  .contents{columns:2 250px; column-gap:40px; margin:34px 0 66px;}
+  .contents a{
+    display:block; break-inside:avoid; padding:11px 2px; text-decoration:none;
+    border-bottom:1px solid var(--rule); color:var(--ink);
+    font-size:14.5px; font-weight:500;
+  }
+  .contents a:hover{color:var(--accent); border-bottom-color:var(--accent);}
+  .contents a:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .contents .cn{
+    font-family:var(--mono); font-size:10.5px; font-weight:600; color:var(--accent);
+    margin-right:12px; font-variant-numeric:tabular-nums;
+  }
+
+  /* ---------- sections ---------- */
+  section{margin:0 0 70px; scroll-margin-top:20px;}
+  .sh{border-top:2px solid var(--ink); padding-top:14px; margin-bottom:26px;}
+  .sh .eyebrow{
+    font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent); display:block; margin-bottom:10px;
+  }
+  h2{
+    font-family:var(--display); font-weight:600; font-size:clamp(27px,3.6vw,36px);
+    line-height:1.1; letter-spacing:-.015em; margin:0; max-width:24ch; text-wrap:balance;
+  }
+  .sh p{margin:12px 0 0; color:var(--ink-soft); font-size:17px; max-width:var(--measure);}
+  h3{
+    font-family:var(--body); font-weight:700; font-size:16.5px; letter-spacing:-.005em;
+    margin:34px 0 11px; color:var(--ink);
+  }
+  h4{
+    font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.11em;
+    text-transform:uppercase; color:var(--ink-faint); margin:26px 0 9px;
+  }
+  h4{font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.11em;
+     text-transform:uppercase; color:var(--ink-faint); margin:26px 0 9px;}
+  p{margin:0 0 15px; max-width:var(--measure);}
+  strong{font-weight:600; color:var(--ink);}
+  ul,ol{margin:0 0 16px; padding-left:23px; max-width:var(--measure);}
+  li{margin-bottom:8px;}
+  li::marker{color:var(--ink-faint);}
+  code{
+    font-family:var(--mono); font-size:.85em; background:var(--sunk);
+    padding:1px 5px; border:1px solid var(--rule-soft); overflow-wrap:anywhere;
+  }
+  a{color:var(--accent);}
+  .fname{
+    display:block; font-family:var(--mono); font-size:11px; font-weight:600;
+    letter-spacing:.05em; color:var(--ink-faint); background:var(--sunk);
+    border:1px solid var(--rule); border-bottom:none; padding:9px 14px; margin:22px 0 0;
+  }
+  pre{
+    font-family:var(--mono); font-size:12.5px; line-height:1.6;
+    background:var(--sunk); color:var(--ink-soft);
+    border:1px solid var(--rule); padding:15px 16px; overflow-x:auto; margin:0 0 20px;
+  }
+  pre code{background:none; border:none; padding:0; font-size:inherit; color:inherit;}
+
+  /* ---------- question treatment ---------- */
+  .q{border-top:1px solid var(--rule); padding:30px 0 8px;}
+  .q:first-of-type{border-top:none;}
+  .qh{display:flex; gap:16px; align-items:baseline; margin-bottom:16px;}
+  .qh .qn{
+    font-family:var(--mono); font-size:12px; font-weight:600; color:var(--accent);
+    background:var(--accent-soft); padding:3px 9px; flex:none;
+  }
+  .qh h3{
+    font-family:var(--display); font-weight:500; font-size:23px; line-height:1.2;
+    margin:0; letter-spacing:-.012em; max-width:26ch; text-wrap:balance;
+  }
+  .short{
+    background:var(--surface); border-left:3px solid var(--accent);
+    border-top:1px solid var(--rule); border-right:1px solid var(--rule);
+    border-bottom:1px solid var(--rule);
+    padding:16px 19px; margin:0 0 18px; max-width:var(--measure);
+  }
+  .short .lbl{
+    display:block; font-family:var(--mono); font-size:10px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:7px;
+  }
+  .short p{font-size:17px; margin:0; color:var(--ink);}
+  .short p + p{margin-top:10px;}
+
+  /* ---------- callouts ---------- */
+  .note{
+    background:var(--surface); border:1px solid var(--rule);
+    border-left:3px solid var(--ink-faint); padding:15px 18px; margin:20px 0;
+  }
+  .note.good{border-left-color:var(--good);}
+  .note.warn{border-left-color:var(--crit);}
+  .note .lbl{
+    display:block; font-family:var(--mono); font-size:10px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px;
+  }
+  .note.good .lbl{color:var(--good);}
+  .note.warn .lbl{color:var(--crit);}
+  .note p{font-size:16px; margin:0 0 10px; max-width:64ch;}
+  .note p:last-child{margin-bottom:0;}
+
+  .verdict{
+    background:var(--accent-soft); border:1px solid var(--accent);
+    padding:20px 22px; margin:22px 0;
+  }
+  .verdict h3{
+    font-family:var(--display); font-weight:600; font-size:20px; line-height:1.25;
+    color:var(--accent); margin:0 0 10px; letter-spacing:-.01em;
+  }
+  .verdict p{font-size:16.5px; margin:0 0 11px; max-width:64ch;}
+  .verdict p:last-child{margin-bottom:0;}
+
+  /* ---------- tables ---------- */
+  .scroll{overflow-x:auto; margin:20px 0; border:1px solid var(--rule); background:var(--surface);}
+  table{border-collapse:collapse; width:100%; min-width:560px; font-size:14px; line-height:1.5;}
+  caption{
+    caption-side:top; text-align:left; font-family:var(--mono); font-size:10px;
+    font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-faint); padding:14px 16px 10px;
+  }
+  th{
+    text-align:left; font-family:var(--mono); font-size:10px; font-weight:600;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--ink-faint);
+    padding:9px 16px; border-bottom:2px solid var(--ink); vertical-align:bottom; white-space:nowrap;
+  }
+  td{padding:12px 16px; border-bottom:1px solid var(--rule-soft); vertical-align:top; color:var(--ink-soft);}
+  tbody tr:last-child td{border-bottom:none;}
+  td.k{color:var(--ink); font-weight:600;}
+  td.n{font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap; font-size:13px;}
+
+  .tag{
+    font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.1em;
+    text-transform:uppercase; padding:3px 8px; display:inline-block; white-space:nowrap;
+  }
+  .t-yes{background:var(--good-soft); color:var(--good);}
+  .t-open{background:var(--warn-soft); color:var(--warn);}
+  .t-no{background:var(--crit-soft); color:var(--crit);}
+  .t-info{background:var(--accent-soft); color:var(--accent);}
+
+  /* ---------- pipeline strip ---------- */
+  .flowwrap{overflow-x:auto; margin:22px 0 8px; padding-bottom:6px;}
+  .flow{display:flex; min-width:min-content; gap:4px;}
+  .fn{
+    border:1px solid var(--rule); background:var(--surface); padding:9px 11px;
+    min-width:88px; font-size:11.5px; line-height:1.3; color:var(--ink-soft);
+  }
+  .fn b{display:block; font-size:12px; font-weight:700; color:var(--ink); margin-bottom:2px;}
+  .fn.gate{background:var(--crit-soft); border-color:var(--crit);}
+  .fn.gate b{color:var(--crit);}
+  .fn.auto{background:var(--good-soft); border-color:var(--good);}
+  .fn.auto b{color:var(--good);}
+  .fkey{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); display:flex; flex-wrap:wrap; gap:5px 18px;}
+  .fkey span{display:flex; align-items:center; gap:6px;}
+  .fkey i{width:9px; height:9px; display:inline-block; border:1px solid var(--rule);}
+  .fkey i.a{background:var(--good-soft); border-color:var(--good);}
+  .fkey i.g{background:var(--crit-soft); border-color:var(--crit);}
+  /* ---------- diagrams ---------- */
+  figure.dg{margin:26px 0; padding:0;}
+  figure.dg svg{max-width:100%; height:auto; display:block; color:var(--ink-soft);}
+  figure.dg figcaption{
+    font-size:14.5px; line-height:1.5; color:var(--ink-faint);
+    margin-top:12px; max-width:66ch;
+  }
+  figure.dg figcaption b{color:var(--ink-soft); font-weight:600;}
+  .dg-line{stroke:currentColor; fill:none; stroke-width:1.5;}
+  .dg-dash{stroke:currentColor; fill:none; stroke-width:1.5; stroke-dasharray:5 5;}
+  .dg-box{fill:var(--surface); stroke:currentColor; stroke-width:1.5;}
+  .dg-fill{fill:currentColor;}
+  .dg-acc{stroke:var(--accent); fill:none; stroke-width:2;}
+  .dg-accdash{stroke:var(--accent); fill:none; stroke-width:1.5; stroke-dasharray:4 4;}
+  .dg-accf{fill:var(--accent);}
+  .dg-accbox{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.5;}
+  .dg-t{fill:var(--ink); font-family:var(--body); font-size:12.5px;}
+  .dg-tb{fill:var(--ink); font-family:var(--body); font-size:12.5px; font-weight:600;}
+  .dg-tf{fill:var(--ink-faint); font-family:var(--body); font-size:11.5px;}
+  .dg-tm{fill:var(--ink-faint); font-family:var(--mono); font-size:10px;}
+  .dg-ta{fill:var(--accent); font-family:var(--body); font-size:12px; font-weight:600;}
+
+  footer{border-top:2px solid var(--ink); padding-top:22px; margin-top:16px;}
+  footer p{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:.03em; max-width:70ch; line-height:1.7;}
+
+  @media (max-width:620px){
+    body{font-size:16px;}
+    .wrap{padding:0 18px 80px;}
+    .qh{flex-direction:column; gap:9px;}
+    .family{margin:0 -18px; padding:0 18px;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="family" aria-label="Document set">
+  <a href="01-the-evidence.html">01 The Evidence</a>
+  <span class="here">02 The Plan</span>
+  <a href="03-implementation.html">03 Implementation</a>
+</nav>
+
+<header class="mast">
+  <p class="num">Document 02 of 03</p>
+  <h1>The Plan</h1>
+  <p class="sf">What we are building, what it costs, and answers to the seven questions that came back from the first draft. The evidence sits in document 01; the build order sits in document 03.</p>
+  <div class="meta">
+    <span>~40 minutes</span>
+    <span>Revised against feedback</span>
+    <span>Supersedes the Decisions and Plan tabs of the original</span>
+  </div>
+</header>
+
+<nav class="contents" aria-label="Contents">
+  <a href="#stands"><span class="cn">01</span>Where this stands now</a>
+  <a href="#releases"><span class="cn">02</span>Deploying without releasing</a>
+  <a href="#models"><span class="cn">03</span>Claude now, other models later</a>
+  <a href="#authority"><span class="cn">04</span>What a spec is authoritative for</a>
+  <a href="#granularity"><span class="cn">05</span>Spec size, and the graph problem</a>
+  <a href="#chunking"><span class="cn">06</span>How work gets chunked</a>
+  <a href="#architecture"><span class="cn">07</span>Where architecture lives</a>
+  <a href="#team"><span class="cn">08</span>What a team is for</a>
+  <a href="#operating"><span class="cn">09</span>How the organisation runs</a>
+  <a href="#shape"><span class="cn">10</span>The pipeline, in short</a>
+  <a href="#cost"><span class="cn">11</span>What it costs</a>
+  <a href="#open"><span class="cn">12</span>What is still open</a>
+</nav>
+
+<!-- ==================== 01 ==================== -->
+<section id="stands">
+  <div class="sh">
+    <span class="eyebrow">Status</span>
+    <h2>Where this stands now</h2>
+    <p>Four things moved since the first draft. Two of them close questions the original called open.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>What changed, and what it means</caption>
+      <thead><tr><th>Now known</th><th>Status</th><th>Consequence</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">One repository is the destination</td>
+          <td><span class="tag t-yes">Closed</span></td>
+          <td><strong>This was the one genuinely hard decision in the original and it is now settled.</strong> Roughly 48 repositories exist today, mostly infrastructure. See the note below — the number is less frightening than it looks.</td>
+        </tr>
+        <tr>
+          <td class="k">Nothing in the existing codebase is protected</td>
+          <td><span class="tag t-yes">Confirmed</span></td>
+          <td>Keep what makes sense, bin the rest. The salvage review is a named task with a named owner, which is exactly the state the original assumed. Assess four layers separately: domain knowledge, integrations, application code, infrastructure. They have different answers.</td>
+        </tr>
+        <tr>
+          <td class="k">Continuous deployment to production is constrained</td>
+          <td><span class="tag t-open">Product decision</span></td>
+          <td>The primary user is a clinician, and changing the product under them repeatedly is a real usability concern rather than an excuse. <strong>This changes less than it appears</strong> — see section 02.</td>
+        </tr>
+        <tr>
+          <td class="k">Self-hosted models are a possible future</td>
+          <td><span class="tag t-info">Watch</span></td>
+          <td>Cost-driven, may never happen. It affects the economics and three interfaces, not the architecture. See section 03.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>Forty-eight repositories is not a migration project</h3>
+    <p>The instinct on hearing "we want one repository" and "there are forty-eight" is to plan a consolidation. Don't. <strong>Create the monorepo as the home for what you are building, and let the old repositories die as their code is replaced or retired.</strong></p>
+    <p>Most of them are infrastructure and will not move at all — infrastructure-as-code belongs with the thing it provisions, and there is no agent-context argument for dragging it in. Of the application repositories, the ones being rebuilt never migrate; they are superseded. The ones being kept move when someone next has a reason to touch them.</p>
+    <p>Migration by attrition costs nearly nothing and delivers the benefit — whole-system visibility for agents — from the first day the new repository exists. A consolidation project delivers the same benefit six months later, having consumed the six months.</p>
+  </div>
+
+  <div class="note">
+    <span class="lbl">The number worth getting</span>
+    <p>How many repositories hold <em>application</em> code, and how many of those are candidates to keep after the salvage review. That is the figure that matters, and it is almost certainly single digits. Forty-eight is a scary number that mostly describes Terraform.</p>
+  </div>
+</section>
+
+<!-- ==================== 02 ==================== -->
+<section id="releases">
+  <div class="sh">
+    <span class="eyebrow">Question 01</span>
+    <h2>Deploying continuously without releasing continuously</h2>
+  </div>
+
+  <div class="q">
+    <div class="qh">
+      <span class="qn">Q</span>
+      <h3>Clinicians shouldn't see the product change under them. Does that break the pipeline?</h3>
+    </div>
+
+    <div class="short">
+      <span class="lbl">Short answer</span>
+      <p><strong>No — and this is the single strongest argument for feature flags there is.</strong> Deploy continuously, release on whatever cadence product wants. They are different events and conflating them is the actual problem.</p>
+    </div>
+
+    <p>Three things get called "shipping" and only one of them is visible to a clinician:</p>
+    <figure class="dg">
+      <svg viewBox="0 0 780 252" role="img" aria-label="A timeline showing thirteen deploys reaching production continuously while the feature flag stays off and clinicians see no change; at release day the flag flips on and clinicians see one coherent release, while deploys carry on unchanged.">
+        <defs>
+          <marker id="dg1-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- release-day guide -->
+        <line x1="560" y1="42" x2="560" y2="232" class="dg-accdash"/>
+        <text x="560" y="30" text-anchor="middle" class="dg-ta">release day</text>
+
+        <!-- row 1: deploys -->
+        <text x="112" y="76" text-anchor="end" class="dg-tb">Deploys</text>
+        <line x1="130" y1="72" x2="726" y2="72" class="dg-line" marker-end="url(#dg1-arw)"/>
+        <circle cx="160" cy="72" r="5" class="dg-fill"/>
+        <circle cx="205" cy="72" r="5" class="dg-fill"/>
+        <circle cx="250" cy="72" r="5" class="dg-fill"/>
+        <circle cx="295" cy="72" r="5" class="dg-fill"/>
+        <circle cx="340" cy="72" r="5" class="dg-fill"/>
+        <circle cx="385" cy="72" r="5" class="dg-fill"/>
+        <circle cx="430" cy="72" r="5" class="dg-fill"/>
+        <circle cx="475" cy="72" r="5" class="dg-fill"/>
+        <circle cx="520" cy="72" r="5" class="dg-fill"/>
+        <circle cx="605" cy="72" r="5" class="dg-fill"/>
+        <circle cx="650" cy="72" r="5" class="dg-fill"/>
+        <circle cx="695" cy="72" r="5" class="dg-fill"/>
+        <text x="330" y="55" text-anchor="middle" class="dg-tf">every merge reaches production</text>
+
+        <!-- row 2: flag state -->
+        <text x="112" y="146" text-anchor="end" class="dg-tb">Flag</text>
+        <line x1="130" y1="142" x2="560" y2="142" class="dg-dash"/>
+        <line x1="560" y1="142" x2="726" y2="142" class="dg-acc" marker-end="url(#dg1-arw)"/>
+        <text x="340" y="132" text-anchor="middle" class="dg-tm">OFF &mdash; code is in production, dark</text>
+        <text x="645" y="132" text-anchor="middle" class="dg-ta">ON</text>
+
+        <!-- row 3: what clinicians see -->
+        <text x="112" y="214" text-anchor="end" class="dg-tb">Clinicians</text>
+        <polyline points="130,210 560,210 560,190 726,190" class="dg-line" marker-end="url(#dg1-arw)"/>
+        <text x="340" y="228" text-anchor="middle" class="dg-tf">no change, for weeks</text>
+        <text x="645" y="180" text-anchor="middle" class="dg-ta">one coherent release</text>
+      </svg>
+      <figcaption><b>Deploy and release are different events with different owners.</b> Code reaches production on every merge and stays invisible; a separate, rarer act of product judgement makes it visible. Reversing that act is a toggle, not a deployment &mdash; which is why the release cadence can be whatever clinicians need without engineering ever batching work.</figcaption>
+    </figure>
+
+
+
+    <div class="scroll">
+      <table>
+        <caption>Three events, three owners</caption>
+        <thead><tr><th>Event</th><th>What happens</th><th>Who decides</th><th>Cadence</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Deploy</td><td>Code reaches production infrastructure. Nobody sees anything.</td><td>The pipeline</td><td><strong>Continuous</strong></td></tr>
+          <tr><td class="k">Release</td><td>A capability becomes visible to users. A flag flips.</td><td class="k">Product</td><td><strong>Whatever suits clinicians</strong></td></tr>
+          <tr><td class="k">Rollback</td><td>Either one is reversed. Deploy reverts automatically on a health signal; release reverts by flipping the flag back.</td><td>Automatic, or one person</td><td>Seconds</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>So the constraint as stated — <em>full CI/CD to staging, batched dot releases beyond that</em> — is satisfiable without giving up anything the pipeline depends on. Code flows to production continuously, dark. On release day a set of flags flips and clinicians see one coherent change.</p>
+
+    <div class="note warn">
+      <span class="lbl">The version of this that fails</span>
+      <p><strong>Batching the deploy rather than the release.</strong> If code sits on a branch for three weeks waiting for a release window, you lose small batches — and small batches is the assumption every other control in this plan rests on. Review gets harder, the diff gets bigger, and when something breaks you have three weeks of changes to search rather than one.</p>
+      <p>Say it precisely when you challenge the constraint: <strong>nobody is proposing that clinicians see daily changes.</strong> The proposal is that code reaches production daily and clinicians see changes monthly. Those are compatible, and the second is a product decision nobody in engineering needs to win.</p>
+    </div>
+
+    <div class="note good">
+      <span class="lbl">Where your instinct to challenge is right, and how far to push</span>
+      <p>Some changes genuinely should go straight out: a copy fix, a logging change, a bug fix restoring intended behaviour. That is Lane 1 in the risk model, and "the user sees a defect corrected" is not a confusing change. <strong>Worth winning, but you don't need it.</strong> The flag model gives you the engineering benefits regardless, so this is an optimisation rather than a dependency — which is a much easier argument to have.</p>
+    </div>
+
+    <h3>Where a flag actually lives</h3>
+
+    <p>&ldquo;Put it behind a flag&rdquo; is the answer people give and it is not specific enough to build from. A flag has three parts, they live in three different places, and <strong>collapsing them is what makes the whole idea sound vague</strong>.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>Three parts, three homes</caption>
+        <thead><tr><th>Part</th><th>What it is</th><th>Where it lives</th><th>Changed by</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Definition</td>
+            <td>Name, description, owner, removal date, default state, release group.</td>
+            <td><strong>In the repository</strong>, version controlled.</td>
+            <td>A pull request &mdash; so it is reviewed like anything else.</td>
+          </tr>
+          <tr>
+            <td class="k">Evaluation</td>
+            <td>The code asking whether this is on for this context.</td>
+            <td>Application code, through <strong>one interface</strong> rather than scattered checks.</td>
+            <td>A pull request.</td>
+          </tr>
+          <tr>
+            <td class="k">State</td>
+            <td>The actual on/off value, per environment.</td>
+            <td class="k"><strong>A flag provider, outside the repository.</strong></td>
+            <td class="k"><strong>A toggle. No deploy, no build, no merge.</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="verdict">
+      <h3>The third row is the whole point</h3>
+      <p><strong>State cannot live in the repository.</strong> If flipping a flag requires a deploy then you have gained nothing over deploying the feature itself &mdash; and the entire argument for separating deploy from release collapses.</p>
+      <p>Which provider, who may flip one, and what a flag targets are all still open &mdash; set out below.</p>
+    </div>
+
+    <h3>Two kinds of flag, and one thing that is not a flag</h3>
+
+    <div class="scroll">
+      <table>
+        <caption>Mixing these is how an estate ends up with four hundred flags</caption>
+        <thead><tr><th>Kind</th><th>Purpose</th><th>Lifespan</th><th>Removed?</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Release flag</td><td>Hide unfinished or unreleased capability. <strong>This is the one that solves the clinician problem.</strong></td><td>Days to weeks</td><td><span class="tag t-yes">Always</span> Has a removal date at creation</td></tr>
+          <tr><td class="k">Kill switch</td><td>Disable something that is misbehaving, without a release.</td><td>Permanent</td><td><span class="tag t-no">Never</span> Marked as a different kind so cleanup rules skip it</td></tr>
+          <tr><td class="k">Entitlement<br><span style="font-weight:400;color:var(--ink-faint)">not a flag</span></td><td>Whether a given customer or plan has access to something.</td><td>Permanent</td><td class="k"><strong>Belongs in the domain model.</strong> Treating this as a flag is the single most common cause of flag sprawl.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>How a dot release actually happens</h3>
+
+    <ol>
+      <li><strong>Staff exposure first.</strong> The group is switched on for internal users while clinicians still see nothing &mdash; this is the step that buys back the risk of code sitting dark.</li>
+      <li><strong>Product flips the group</strong> on release day. One action, one coherent change, and the cadence is genuinely their decision.</li>
+      <li><strong>A cleanup change removes the flags</strong> and the dead branches after a bake period.</li>
+    </ol>
+
+    <h3>How the flip actually reaches a clinician</h3>
+
+    <figure class="dg">
+      <svg viewBox="0 0 780 272" role="img" aria-label="A timeline where product flips a flag from off to on. A clinician session that began before the flip continues to see the old behaviour for its whole life; only a session started after the flip sees the new release.">
+        <defs>
+          <marker id="dg4-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <text x="430" y="30" text-anchor="middle" class="dg-ta">product flips the group</text>
+        <line x1="430" y1="40" x2="430" y2="152" class="dg-accdash"/>
+        <line x1="430" y1="178" x2="430" y2="238" class="dg-accdash"/>
+
+        <text x="150" y="74" text-anchor="end" class="dg-tb">Flag state</text>
+        <line x1="168" y1="70" x2="430" y2="70" class="dg-dash"/>
+        <line x1="430" y1="70" x2="740" y2="70" class="dg-acc" marker-end="url(#dg4-arw)"/>
+        <text x="300" y="60" text-anchor="middle" class="dg-tm">OFF</text>
+        <text x="590" y="60" text-anchor="middle" class="dg-ta">ON</text>
+
+        <text x="150" y="132" text-anchor="end" class="dg-tb">Session A</text>
+        <rect x="230" y="112" width="340" height="30" rx="3" class="dg-box"/>
+        <circle cx="230" cy="127" r="4" class="dg-fill"/>
+        <circle cx="570" cy="127" r="4" class="dg-fill"/>
+        <text x="400" y="167" text-anchor="middle" class="dg-tf">signed in before the flip &mdash; sees OFF for its whole life</text>
+
+        <text x="150" y="212" text-anchor="end" class="dg-tb">Session B</text>
+        <rect x="600" y="192" width="150" height="30" rx="3" class="dg-accbox"/>
+        <circle cx="600" cy="207" r="4" class="dg-accf"/>
+        <text x="675" y="212" text-anchor="middle" class="dg-ta">next sign-in</text>
+
+        <text x="168" y="258" class="dg-tf">The flag is read once, when a session starts &mdash; never re-read underneath someone mid-task.</text>
+      </svg>
+      <figcaption><b>This is the part that actually satisfies the constraint, and it is a design choice rather than a property of flags.</b> Most SDKs evaluate on every render by default &mdash; which would change the screen under a clinician mid-task the instant product flipped a group, building the exact behaviour the rule exists to prevent. Read the flag at session start and hold it, and a flip reaches each person at their next sign-in instead.</figcaption>
+    </figure>
+
+    <div class="scroll">
+      <table>
+        <caption>Four things this still needs decided</caption>
+        <thead><tr><th>Decision</th><th>Sensible default</th><th>Why it needs a real answer</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Where the state lives</td>
+            <td>Azure App Configuration, behind OpenFeature.</td>
+            <td>Managed, already on the estate, and product can use it without touching git. <strong>The wrapper matters more than the choice</strong> &mdash; it keeps the provider swappable later.</td>
+          </tr>
+          <tr>
+            <td class="k">Who may flip one</td>
+            <td>Product, through the provider interface, every change audit-logged.</td>
+            <td>Needs to be an access-controlled role rather than a convention. <em>Anyone with the portal link</em> is not a release process, and this is the moment the release cadence stops being engineering&rsquo;s problem.</td>
+          </tr>
+          <tr>
+            <td class="k">What a flag targets</td>
+            <td class="k"><span class="tag t-open">Genuinely open</span></td>
+            <td><strong>Depends on the tenancy model, which is not established.</strong> If the product is multi-tenant by practice, a release can go to one practice first and staff exposure is easy. If it is a single estate, every flip is all-or-nothing and internal exposure needs a different mechanism &mdash; a user cohort, or a separate environment.</td>
+          </tr>
+          <tr>
+            <td class="k">When the app reads it</td>
+            <td>At session start, held for the session.</td>
+            <td><strong>The load-bearing one, above.</strong> Get it wrong and flags actively cause the problem they were adopted to solve.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The cost of this, stated plainly</span>
+      <p><strong>Code sitting dark for six weeks is code that has never run in production.</strong> &ldquo;We deploy continuously&rdquo; is doing less work than it sounds if nothing is exercising the new path &mdash; you have moved the risk rather than removed it.</p>
+      <p>Step 3 above is what buys it back. Internal users on the new path for a week before the group release gives you real production exercise, real data shapes and real error rates, with nobody clinical affected. <strong>Skip that step and the first genuine test of six weeks of work is the release itself</strong>, which is the situation this whole design exists to avoid.</p>
+    </div>
+
+    <div class="note">
+      <span class="lbl">On testing combinations, which sounds worse than it is</span>
+      <p>Every flag is theoretically a branch, so <em>n</em> flags is 2<sup><em>n</em></sup> states. In practice you test two: <strong>everything currently released</strong>, which is production, and <strong>everything in the next group</strong>, which is staging. That is only true because release flags flip as a group rather than individually &mdash; which is a second reason to group them, beyond giving clinicians a coherent change.</p>
+    </div>
+
+<h3>Flag hygiene, which is not optional</h3>
+    <p>Every flag is a branch in the code and a multiplier on the test matrix. Left alone they accumulate until nobody knows which combinations are live. So flags get a lifecycle from day one:</p>
+    <ul>
+      <li><strong>Every flag has a named owner and a removal date at creation.</strong> Both required fields, not conventions.</li>
+      <li><strong>CI fails on a release flag past its removal date.</strong> Not a warning &mdash; a failure, or it will be ignored.</li>
+      <li><strong>Kill switches are marked as a different kind</strong> so the cleanup rule skips them rather than being abandoned because it kept flagging things that should stay.</li>
+    </ul>
+    <p>Cheap now, and genuinely painful to introduce against two hundred existing flags.</p>
+  </div>
+</section>
+
+<!-- ==================== 03 ==================== -->
+<section id="models">
+  <div class="sh">
+    <span class="eyebrow">Question 02</span>
+    <h2>Claude now, possibly our own models later</h2>
+  </div>
+
+  <div class="q">
+    <div class="qh">
+      <span class="qn">Q</span>
+      <h3>Does a future move to self-hosted models change the plan?</h3>
+    </div>
+
+    <div class="short">
+      <span class="lbl">Short answer</span>
+      <p><strong>It changes the economics, not the architecture</strong> — provided three things stay abstracted from day one. None of them costs anything to do now and all three are expensive to retrofit.</p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <caption>Keep these portable and the switch stays a configuration change</caption>
+        <thead><tr><th>Keep abstract</th><th>What that means concretely</th><th>If you don't</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Where the model is called</td><td>One place in the codebase makes model calls. Everything else asks that place. The pipeline harness already takes the model as an input rather than hard-coding it.</td><td>Model-specific calls scattered through the code, and the switch becomes a refactor across every service.</td></tr>
+          <tr><td class="k">What is sent</td><td>Prompts, skills and agent definitions are files in version control, not strings in code. They already are, for other reasons.</td><td>Nothing to port. You rewrite them from memory.</td></tr>
+          <tr><td class="k">How you know it still works</td><td>The eval set — recorded past work with known-good outcomes. <strong>This is the portability test.</strong></td><td>The switch becomes a matter of opinion, and it will be argued rather than measured.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What genuinely would change</h3>
+    <ul>
+      <li><strong>Two commercial features disappear.</strong> The batch discount on non-urgent work, and the built-in budget ceiling used to bound agent loops. The budget one matters more — it would need rebuilding in the harness.</li>
+      <li><strong>Prompt caching behaves differently</strong>, and caching is the largest single lever on spend. The cost model needs rebuilding, not adjusting.</li>
+      <li><strong>The compliance position changes shape entirely</strong> — self-hosting removes the third-party processing question and replaces it with an infrastructure security question. Different, not simpler.</li>
+    </ul>
+
+    <div class="note warn">
+      <span class="lbl">The honest caution</span>
+      <p><strong>Self-hosting is rarely cheaper than it looks at this size.</strong> It converts a monthly bill into capital plus a fraction of a person, and that person is a permanent commitment rather than a one-off. It is the same shape as the on-premise argument: frequently right for predictable, high load, and almost never right if you forget to count the person.</p>
+      <p>The decision needs a modelled workload rather than a comparison of headline token prices. Worth revisiting when usage is stable enough to forecast — which is roughly the point the spend review has six months of data.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 04 ==================== -->
+<section id="authority">
+  <div class="sh">
+    <span class="eyebrow">Question 03</span>
+    <h2>What a spec is actually authoritative for</h2>
+    <p>The hardest question in the feedback, and the one where getting the framing right resolves most of the rest.</p>
+  </div>
+
+  <div class="q">
+    <div class="qh">
+      <span class="qn">Q</span>
+      <h3>Specs live in the repo and describe intent. But are they the source of truth for how the system behaves?</h3>
+    </div>
+
+    <h3>Where the spec lives, and where the scenarios live</h3>
+
+    <div class="short">
+      <span class="lbl">The decision</span>
+      <p><strong>The issue is the spec.</strong> It is written and revised there while the work is live, product approves it there, and at merge it is snapshotted into the repository as a frozen record.</p>
+      <p><strong>The scenarios live with the feature they test</strong>, not with the change that introduced them &mdash; tagged so each one still traces back to its issue.</p>
+    </div>
+
+    <p>Those two halves are organised on <em>opposite</em> principles, and that is the point rather than an inconsistency.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>Two artifacts, two organising principles</caption>
+        <thead><tr><th></th><th>The spec</th><th>The scenarios</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Organised by</td><td class="k">The change</td><td class="k">The feature</td></tr>
+          <tr><td class="k">Because</td><td>It records intent at a moment. It is a historical document and you find it by asking <em>why is this like this</em>.</td><td>They describe behaviour as it is now. You find them by asking <em>what does this screen do</em>.</td></tr>
+          <tr><td class="k">Lives at</td><td><code>ACME-412</code>, snapshotted to <code>specs/ACME-412.md</code></td><td><code>features/discharge-intake.feature</code></td></tr>
+          <tr><td class="k">After merge</td><td><strong>Frozen.</strong> Never edited, so it cannot drift.</td><td><strong>Living.</strong> Later changes add, alter and remove scenarios in place.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The mistake this avoids &mdash; and it is an easy one to make</span>
+      <p>The obvious move is to put a change&rsquo;s scenarios next to its spec, in a folder named after the change. <strong>Do that and two hundred changes later you have two hundred feature files, three of which touch the discharge screen, and no way to know what is covered without reading old issues.</strong></p>
+      <p>A change does not create a feature file. <strong>It adds scenarios to the one that already exists.</strong> Open that file and you see everything the capability does today, in one read.</p>
+    </div>
+
+    <span class="fname">features/discharge-intake.feature</span>
+    <pre><code>Feature: Discharge intake
+
+  @ACME-100-R1
+  Scenario: Valid discharge creates a care plan draft
+    ...
+
+  @ACME-412-R2
+  Scenario: Unparseable summary is queued for review
+    Given a discharge message with a malformed summary
+    When  intake processes it
+    Then  the record is queued for manual review
+    And   no care plan draft is created</code></pre>
+
+    <p>The tag is the whole traceability mechanism. <strong>What does this system do?</strong> Read the feature file &mdash; always current, organised by capability. <strong>Why does it do that?</strong> Follow the tag to the issue, and to the frozen snapshot of what was agreed when it merged.</p>
+
+    <h4>Why the snapshot, when the issue already exists</h4>
+
+    <div class="note">
+      <span class="lbl">One generated file, never hand-edited</span>
+      <p>At merge, CI copies the issue body to <code>specs/ACME-412.md</code> and commits it once. It is <strong>generated output, like the API client</strong> &mdash; read-only, and hand-editing it fails the build.</p>
+      <p>Two things that buys. <strong>The record travels with the code:</strong> check out any commit and the requirement that produced it is there, which is the question a health-plan security review actually asks. And <strong>it cannot be rewritten after the fact</strong> &mdash; an issue edited a year later leaves no diff anyone will read, while a committed snapshot is fixed at the moment it mattered.</p>
+      <p>No dual maintenance, because nobody maintains it. It is taken once and never touched.</p>
+    </div>
+
+    <h3>The mechanism that makes part of the spec undriftable</h3>
+
+    <p>Split the spec by whether a machine can check it.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>Three layers, three different lifespans</caption>
+        <thead><tr><th>Layer</th><th>Example</th><th>Can it drift?</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Acceptance scenarios<br><span style="font-weight:400;color:var(--ink-soft)">plain-language Given/When/Then</span></td>
+            <td>"Given a discharge message with an unreadable summary, when intake processes it, then the record is queued for review and no care plan draft is created."</td>
+            <td><span class="tag t-yes">No</span> These <strong>run as the tests</strong>. CI fails if a scenario has no matching test, and fails again if the test fails. It is a proof, not a document.</td>
+          </tr>
+          <tr>
+            <td class="k">Requirements<br><span style="font-weight:400;color:var(--ink-soft)">numbered rules, scoped to the change</span></td>
+            <td>"If the discharge summary cannot be parsed, the intake service shall queue the record for manual review."</td>
+            <td><span class="tag t-open">Detectably</span> Not executable, but the IDs travel into test names, commits and pull requests — so a requirement with no test that references it is a query, not a mystery.</td>
+          </tr>
+          <tr>
+            <td class="k">Context<br><span style="font-weight:400;color:var(--ink-soft)">rationale, constraints, what was rejected</span></td>
+            <td>"We queue rather than retry because the upstream feed re-sends within the hour and duplicate care plans are worse than a delay."</td>
+            <td><span class="tag t-no">Yes</span> And that is fine, <strong>as long as nobody treats it as current truth.</strong> It is dated. It records what someone thought then.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="verdict">
+      <h3>The rule that follows: anything that must not drift, make executable</h3>
+      <p>Everything else is context, and context ages. That is not a failure — a decision record is <em>supposed</em> to describe the past.</p>
+      <p><strong>The failure mode to design against is a spec that reads authoritative and is checked by nothing.</strong> It is worse than no spec, because people trust it. If a statement in a spec matters enough that being wrong about it would hurt, it belongs in the executable layer or it belongs in a test.</p>
+    </div>
+
+    <div class="note good">
+      <span class="lbl">Why this also answers the product-sign-off question</span>
+      <p>The scenarios product approves are, literally and without translation, the tests that gate production. There is no step where someone converts an approved scenario into a test and introduces a gap. That single wiring decision is what makes the whole spec chain trustworthy rather than ceremonial — and it is a half-day of work, once.</p>
+    </div>
+
+    <h3>The identifier that makes all of this work</h3>
+
+    <p>Freezing a spec at merge only works if you can <em>find</em> it again eighteen months later. That needs one stable identifier, created once and carried everywhere &mdash; and the tracker already issues one.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>One key, carried through every artifact</caption>
+        <thead><tr><th>Where</th><th>What it looks like</th><th>Why there</th></tr></thead>
+        <tbody>
+          <tr><td class="k">The issue</td><td>The ask, the discussion, the key itself.</td><td>The tracker already mints a permanent identifier. Do not invent a second one alongside it.</td></tr>
+          <tr><td class="k">The frozen spec</td><td><code>specs/ACME-412.md</code></td><td><strong>Named by the key, not by a slug.</strong> One identifier, not two that have to be kept in step.</td></tr>
+          <tr><td class="k">Requirement IDs</td><td><code>ACME-412-R2</code></td><td>Scoped to the change that introduced them, so they never collide and never need a central register.</td></tr>
+          <tr><td class="k">Scenario tags</td><td><code>@ACME-412-R2</code> on the scenario</td><td><strong>The most reliable index of the three.</strong> The scenario is the test, so the tag is on the thing that actually runs.</td></tr>
+          <tr><td class="k">Commit trailer</td><td><code>Change-Id: ACME-412</code>, alongside the provenance trailer.</td><td><strong>In the commit, not the pull request title.</strong> Pull requests get squashed, retitled and deleted; commits are permanent.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 800 292" role="img" aria-label="An issue forks into two outputs. One is a feature file organised by capability, holding scenarios from several different changes, each tagged with the change that added it. The other is a frozen markdown snapshot of the issue, organised by change and never edited after merge.">
+        <defs>
+          <marker id="dg3-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- the issue -->
+        <rect x="20" y="110" width="160" height="64" rx="3" class="dg-accbox"/>
+        <text x="100" y="138" text-anchor="middle" class="dg-tb">Issue ACME-412</text>
+        <text x="100" y="157" text-anchor="middle" class="dg-tm">the spec, while live</text>
+
+        <!-- fork -->
+        <path d="M 180 142 C 250 142, 270 85, 336 85" class="dg-line" marker-end="url(#dg3-arw)"/>
+        <path d="M 180 142 C 250 142, 270 223, 336 223" class="dg-line" marker-end="url(#dg3-arw)"/>
+        <text x="260" y="100" text-anchor="middle" class="dg-tm">adds one scenario</text>
+        <text x="260" y="170" text-anchor="middle" class="dg-tm">snapshot at merge</text>
+
+        <!-- feature file -->
+        <rect x="340" y="30" width="430" height="110" rx="3" class="dg-box"/>
+        <text x="356" y="52" class="dg-tm">features/discharge-intake.feature</text>
+        <line x1="356" y1="62" x2="754" y2="62" class="dg-dash"/>
+        <text x="356" y="84" class="dg-tf">@ACME-100-R1  Valid discharge creates a draft</text>
+        <text x="356" y="105" class="dg-ta">@ACME-412-R2  Unparseable summary is queued</text>
+        <text x="356" y="126" class="dg-tf">@ACME-518-R1  Duplicate message is ignored</text>
+        <text x="340" y="162" class="dg-tm">ORGANISED BY FEATURE &mdash; LIVING. A CHANGE ADDS A SCENARIO, NEVER A FILE.</text>
+
+        <!-- frozen snapshot -->
+        <rect x="340" y="195" width="300" height="56" rx="3" class="dg-box" stroke-dasharray="5 4"/>
+        <text x="356" y="218" class="dg-tm">specs/ACME-412.md</text>
+        <text x="356" y="238" class="dg-tf">frozen at merge &middot; read-only</text>
+        <text x="340" y="274" class="dg-tm">ORGANISED BY CHANGE &mdash; HISTORICAL. NEVER EDITED, SO IT CANNOT DRIFT.</text>
+      </svg>
+      <figcaption><b>One issue, two outputs, organised on opposite principles &mdash; and that is deliberate.</b> The scenarios sit with the capability they describe, so opening one file shows everything that capability does today. The snapshot sits with the change, frozen, so the reasoning behind any line is still recoverable years later. The tag on a scenario is the way back from one to the other.</figcaption>
+    </figure>
+
+    <div class="note warn">
+      <span class="lbl">The one discipline this depends on</span>
+      <p><strong>The spec is updated freely while the work is in flight, and frozen the moment it merges.</strong> That distinction is the whole mechanism.</p>
+      <p>Updating during the work is correct &mdash; the interview surfaces things and the document should follow. <strong>Updating after merge is how you rebuild the drift problem</strong>: when a later change alters that behaviour nobody goes back to amend the old record, so it becomes quietly wrong while still reading as current. A frozen record cannot be wrong; it can only be historical, which is what it is meant to be.</p>
+    </div>
+
+    <div class="note good">
+      <span class="lbl">What this looks like when behaviour has changed three times</span>
+      <p>A capability added in one change, modified in a second, given an edge case in a third, produces three frozen specs. <strong>To know what it does now, read the tests.</strong> To know why it is like that, read the three specs in order &mdash; which is a changelog, and an honest one.</p>
+      <p>Compare that with a single maintained document claiming to describe current intent, which is wrong from the second change onward and gives no indication that it is. <strong>Three accurate historical records beat one confident inaccurate one</strong>, and they cost nothing to keep because nobody maintains them.</p>
+    </div>
+
+    <div class="note">
+      <span class="lbl">If work is tracked somewhere other than the repository host</span>
+      <p>Put the tracker where the pipeline can read and write it without glue &mdash; the repository host, since the repositories exist there regardless. If the wider business runs portfolio reporting elsewhere, <strong>mirror one way only</strong>, from that system into this one, so there is still a single writer per fact. Two systems both editing the same field is the reconciliation problem this design avoids everywhere else.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 05 ==================== -->
+<section id="granularity">
+  <div class="sh">
+    <span class="eyebrow">Question 04</span>
+    <h2>How big is a spec, and how do specs know about each other?</h2>
+  </div>
+
+  <div class="q">
+    <div class="qh">
+      <span class="qn">Q</span>
+      <h3>One spec per domain, service, feature, or bounded context? And how do you manage the dependencies between them?</h3>
+    </div>
+
+    <div class="short">
+      <span class="lbl">Short answer</span>
+      <p><strong>One spec per change. Not per domain, service, feature or bounded context — per change.</strong></p>
+      <p>And the dependency-graph problem you haven't seen solved is mostly an artefact of getting that wrong. Fix the granularity and it largely stops existing.</p>
+    </div>
+
+    <p>The reason the graph problem is hard is that people write specs as <em>durable descriptions of an area</em>. A durable spec has to be maintained, has to know about its neighbours, and has to be reconciled when two changes touch it — which is exactly when you start wanting a dependency graph, and exactly when nobody has time to maintain one.</p>
+
+    <p><strong>A spec that describes one change never has that problem.</strong> It is written, approved, implemented, merged — and then it is history. It is never updated, so it cannot drift and it cannot conflict. Its scenarios are added to the feature file for the capability they describe, and live on there as tests. The document becomes a record of why something was built.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>The two models, and what each costs</caption>
+        <thead><tr><th></th><th>Spec per area <span style="font-weight:400;text-transform:none;letter-spacing:0">(domain / service / context)</span></th><th>Spec per change</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Lifespan</td><td>Forever. Must be maintained.</td><td>Until merge. Then it is a record.</td></tr>
+          <tr><td class="k">Can it drift?</td><td>Yes, immediately and permanently.</td><td>No. Nothing to drift from.</td></tr>
+          <tr><td class="k">Dependencies</td><td>Real, growing, and needing a graph nobody maintains.</td><td>Largely absent — two changes rarely depend on each other's <em>intent</em>.</td></tr>
+          <tr><td class="k">Merge conflicts</td><td>Two changes to one area edit one document.</td><td>Two documents, no conflict.</td></tr>
+          <tr><td class="k">"What does this area do now?"</td><td>Read the spec — <strong>and it may be lying.</strong></td><td>Read the tests. They cannot lie.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>So where does durable truth live?</h3>
+
+    <p>The instinct behind "one spec per domain" is sound — <em>something</em> should describe the whole. It just isn't a spec. Three artifacts do that job, each with exactly one responsibility:</p>
+
+    <div class="scroll">
+      <table>
+        <caption>What replaces the durable spec</caption>
+        <thead><tr><th>Artifact</th><th>Answers</th><th>Kept true by</th></tr></thead>
+        <tbody>
+          <tr><td class="k">The test suite</td><td>What does the system do <em>now</em>?</td><td>It runs. Nothing else is required.</td></tr>
+          <tr><td class="k">Architecture records<br><span style="font-weight:400;color:var(--ink-soft)">ADRs plus a one-page overview</span></td><td>Why is it shaped this way, and what are the pieces?</td><td>Small, rarely changes, superseded rather than edited. See section 07.</td></tr>
+          <tr><td class="k">The contracts<br><span style="font-weight:400;color:var(--ink-soft)">API schema, event schemas</span></td><td>What are the interfaces?</td><td><strong>Generated from the code</strong>, so true by construction. CI fails when the generated copy is stale.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="verdict">
+      <h3>If you want a spec to be durable, you actually want one of those three</h3>
+      <p>That substitution is the whole answer to the graph question. You are not maintaining a web of interdependent living specifications. You have a chronological record of changes, a test suite that is the current behaviour, and a small architecture record that explains the shape.</p>
+      <p><strong>Nothing in that set needs a dependency graph, because nothing in it needs reconciling with anything else.</strong></p>
+    </div>
+
+    <h3>The dependencies that are real</h3>
+
+    <p>Two genuine cases remain, and neither needs a graph:</p>
+    <ul>
+      <li><strong>Two changes touching the same code.</strong> That is a merge concern and version control already solves it. It is not a specification problem wearing a disguise.</li>
+      <li><strong>A change breaking an interface something else depends on.</strong> Solved by contract tests and automated breaking-change detection on the published schema — the machine tells you, at the moment you do it, without anyone having drawn a diagram.</li>
+    </ul>
+
+    <p>The one graph worth having is <strong>the trace from a requirement to its tests to the code that satisfies it</strong>, and that is a query over identifiers rather than a maintained artifact. The requirement ID appears in the spec, as a tag on the scenario that proves it, and in the commit message — so the trace is a search, generated on demand and never stale.</p>
+
+    <div class="note">
+      <span class="lbl">Why nobody has shown you a working spec-dependency graph</span>
+      <p>Because the ones being built are solving a self-inflicted problem. A maintained graph of living specifications has all the properties of a second codebase — it needs writing, reviewing, refactoring and testing — with none of the tooling. The teams that appear to have solved spec drift have mostly stopped asking documents to be authoritative, which looks like a smaller idea than a graph and works considerably better.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 06 ==================== -->
+<section id="chunking">
+  <div class="sh">
+    <span class="eyebrow">Question 05</span>
+    <h2>How work gets chunked</h2>
+  </div>
+
+  <div class="q">
+    <div class="qh">
+      <span class="qn">Q</span>
+      <h3>What is the unit of work? A feature, a product ask, something smaller? When is it too big or too small?</h3>
+    </div>
+
+    <div class="short">
+      <span class="lbl">Short answer</span>
+      <p><strong>Two different units, and conflating them is the trap.</strong> The unit of <em>intent</em> is sized by user value and stays whatever product already uses. The unit of <em>change</em> is sized by what one person can review — and that number is fixed, not negotiated.</p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <caption>Two units, two sizing rules</caption>
+        <thead><tr><th></th><th>Unit of intent</th><th>Unit of change</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Is</td><td>A feature. Your existing format works unchanged.</td><td>One reviewable pull request.</td></tr>
+          <tr><td class="k">Sized by</td><td>User value. Product owns this.</td><td><strong>Reviewability.</strong> Engineering owns this and it is not a judgement call.</td></tr>
+          <tr><td class="k">Who splits it</td><td>Product, as now.</td><td>The pipeline, automatically, at the decomposition stage.</td></tr>
+          <tr><td class="k">Test for "too big"</td><td>More than one outcome, or needs more than one spec.</td><td>Over the diff cap. Roughly 400 lines.</td></tr>
+          <tr><td class="k">Test for "too small"</td><td>Not worth a specification conversation.</td><td>Nothing is too small. Small changes are free.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Your existing feature format feeds this directly.</strong> Features with requirements in scenario form <em>are</em> the input — that is the same format the specification stage produces, so nothing about how product expresses intent has to change. What changes is what happens next: the breakdown into tasks is mechanical and the pipeline does it.</p>
+
+    <h3>The one sizing test worth memorising</h3>
+
+    <div class="verdict">
+      <h3>Can one person read this change and say what it does, without opening a second tab?</h3>
+      <p>If no, it is too big — split it. That test is better than a line count because it catches the change that is four hundred lines across eleven files and genuinely incoherent, which a cap alone waves through.</p>
+      <p>The cap is the mechanical backstop; this is the judgement it approximates. <strong>Agent-opened changes already wait over five times longer to be picked up for review, and size is the main driver.</strong> Every line above what a person can hold in their head is a line that makes the queue worse.</p>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">Where "too small" does bite</span>
+      <p>Not in the size of the change — in the <strong>process applied to it</strong>. A specification conversation for a copy fix is pure ceremony, and a team made to do it will route around the whole system within a month.</p>
+      <p>That is what the risk lanes are for. A copy change gets automated checks and ships. A change touching member data gets a written spec, two reviewers and a named approver. <strong>Same pipeline, four different depths</strong> — and the depth is set by which files were touched, not by anyone's estimate.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 07 ==================== -->
+<section id="architecture">
+  <div class="sh">
+    <span class="eyebrow">Question 06</span>
+    <h2>Where the system architecture lives</h2>
+  </div>
+
+  <div class="q">
+    <div class="qh">
+      <span class="qn">Q</span>
+      <h3>Decision records cover individual decisions. Where does the overall architecture live, and how does it get seeded from nothing?</h3>
+    </div>
+
+    <div class="short">
+      <span class="lbl">Short answer</span>
+      <p><strong>Three artifacts, three jobs.</strong> The mistake is trying to make one document do all three — that is how architecture documents become long, wrong and unread.</p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <caption>The architecture record, split by what keeps each one honest</caption>
+        <thead><tr><th>Artifact</th><th>Answers</th><th>Written by</th><th>Changes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Decision records</td>
+            <td>Why is it like this?</td>
+            <td>A person, one decision each</td>
+            <td><strong>Never.</strong> Immutable once accepted; a new decision supersedes rather than edits. The history is the point.</td>
+          </tr>
+          <tr>
+            <td class="k">The system overview<br><span style="font-weight:400;color:var(--ink-soft)">one page, hand-written</span></td>
+            <td>What is there, what talks to what, where does data live, where are the boundaries?</td>
+            <td>A person, reviewed like code</td>
+            <td>Rarely. If it changes monthly it is too detailed.</td>
+          </tr>
+          <tr>
+            <td class="k">Generated views</td>
+            <td>What does it look like <em>right now</em>?</td>
+            <td class="k">Nobody — generated</td>
+            <td>Every build. Dependency graph, interface surface, the catalogue of what exists.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="verdict">
+      <h3>If it can be generated, generate it</h3>
+      <p>The hand-written part is only what a machine cannot derive: intent, boundaries, and why. Everything else — which service calls which, what the interfaces are, what already exists — is read out of the code on every build and is therefore never wrong.</p>
+      <p>That is what keeps the written half short enough to stay true. <strong>A hand-drawn dependency diagram is wrong within a fortnight and is then actively misleading</strong>, because people trust diagrams more than prose.</p>
+    </div>
+
+    <h3>Seeding it from nothing</h3>
+
+    <p>The overview needs to exist before the first feature, because the design stage reads it — an agent planning a change needs to know what the pieces are. Starting from nothing, it is about an hour:</p>
+
+    <ul>
+      <li><strong>The services and what each is for.</strong> One line each. At the start there may be three.</li>
+      <li><strong>Where data lives</strong>, and which store is authoritative for what. This is the row people skip and regret.</li>
+      <li><strong>The boundaries that must not be crossed</strong> — which layer may reference which. These become enforced rules rather than intentions, so writing them down has teeth immediately.</li>
+      <li><strong>External systems</strong> and what we depend on them for.</li>
+      <li><strong>What is deliberately not decided yet</strong>, so an agent proposes rather than assumes.</li>
+    </ul>
+
+    <p>Keep it to a page. It grows as the system does, and the discipline that keeps it useful is that <strong>anything a generator could produce gets deleted from it.</strong></p>
+
+    <div class="note good">
+      <span class="lbl">This is also the answer to your eFax example</span>
+      <p>"We need to send a fax" is not a specification question and it does not belong in a feature. It is a system-level decision: buy or build, which provider, what happens on failure, does it need an audit trail, where does it sit relative to everything else.</p>
+      <p><strong>That is a decision record, and it is written before any feature depends on it.</strong> Section 08 is about who does that work — it is the part of analysis that survives, and it is the more interesting half.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 08 ==================== -->
+<section id="team">
+  <div class="sh">
+    <span class="eyebrow">Question 07</span>
+    <h2>What a team is for, once the pipeline does the breakdown</h2>
+    <p>The sharpest question in the feedback. It is asking whether this design leaves anything for a team to do together.</p>
+  </div>
+
+  <div class="q">
+    <div class="qh">
+      <span class="qn">Q</span>
+      <h3>If the pipeline decomposes the work, do we still need an analysis phase? Is there collective work left, or is it individuals writing specs with product?</h3>
+    </div>
+
+    <div class="short">
+      <span class="lbl">Short answer</span>
+      <p><strong>The analysis phase doesn't disappear. It loses its clerical half and keeps its design half</strong> — and the half it keeps is the one that was always underserved.</p>
+    </div>
+
+    <p>Analysis has historically bundled two very different activities:</p>
+
+    <div class="scroll">
+      <table>
+        <caption>What happens to each half</caption>
+        <thead><tr><th>Activity</th><th>What it was</th><th>Now</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Translating a requirement into tasks</td>
+            <td>Reading a feature, working out which components change, writing task cards, estimating each.</td>
+            <td><span class="tag t-info">Automated</span> This is mechanical, and it is exactly what the decomposition stage does — faster, more consistently, and with every task traced back to a requirement.</td>
+          </tr>
+          <tr>
+            <td class="k">Deciding how the system should work</td>
+            <td>Squeezed into the gaps, usually by whoever was most senior, often after implementation had started.</td>
+            <td><span class="tag t-yes">Expanded</span> This is now the team's primary collective work, and it happens <em>before</em> anything enters the pipeline.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What a team does together</h3>
+
+    <p>Four things, all of which need more than one person and none of which a pipeline touches:</p>
+
+    <ul>
+      <li><strong>System-level design.</strong> Your fax example, exactly. Buy or build, which provider, failure behaviour, where it sits. These are the problems that need someone to think, and they produce decision records rather than tickets. <strong>This is what the smart people you hire will spend their time on.</strong></li>
+      <li><strong>Risk classification for this product.</strong> Which surfaces are genuinely dangerous <em>here</em> — what counts as clinical logic, what touches member data, where a mistake is unrecoverable. That is domain judgement, it is specific to Medicare aftercare, and it gets written down once and applied automatically forever after.</li>
+      <li><strong>What the tooling is bad at, in this codebase.</strong> The patterns AI reliably gets wrong here — the module whose conventions it always violates, the library version it consistently misuses. Every engineer discovers this privately within weeks and none of them share it. Written down, it becomes something the agent loads before generating, so it stops happening.</li>
+      <li><strong>Boundaries.</strong> Where one service ends and another begins; what belongs in the domain model. Wrong boundaries are the most expensive thing to fix later and the least suited to being decided by one person quickly.</li>
+    </ul>
+
+    <div class="verdict">
+      <h3>The rhythm changes shape rather than disappearing</h3>
+      <p>Instead of a planning ceremony that mostly produces task cards, you get a <strong>recurring architecture forum</strong> where the fax-shaped problems get decided and become records — and a retrospective that updates what the tooling is bad at.</p>
+      <p>Both are genuinely collective, both produce artifacts the pipeline consumes, and both are more interesting than estimating cards. <strong>Specification work with product is individual, and that is fine</strong> — it always was, we just used to do it in a room with eight people watching.</p>
+    </div>
+
+    <div class="note good">
+      <span class="lbl">On hiring, which is the sharper end of the question</span>
+      <p>This is <em>more</em> attractive to strong engineers, not less. You are removing the clerical half of the job and keeping the design half. An engineer who wanted to spend their week deciding how the system should handle a failed fax delivery now spends their week doing that.</p>
+      <p>The people who won't like it are those whose value sat in the translation layer — turning requirements into tasks. That is a real hiring consideration and worth being honest about in interviews rather than discovering in month three. <strong>The role you are describing is closer to a systems designer than a ticket implementer</strong>, and saying so attracts the right people and filters the wrong ones.</p>
+    </div>
+
+    <div class="note">
+      <span class="lbl">One thing not to lose</span>
+      <p>The pipeline decomposes work well and it cannot tell you the requirement was wrong. That is what the specification gate is for, and it is why the person writing the spec with product should usually be an engineer rather than a business analyst — <strong>the value is in the questions asked during the interview</strong>, and those come from knowing what the system can and cannot do.</p>
+    </div>
+  </div>
+</section>
+
+  <section id="operating">
+    <div class="sh">
+      <span class="eyebrow">The operating model</span>
+      <h2>What persists, who does what, and how a week actually runs</h2>
+      <p>The pipeline describes how one change flows. This describes how a company organises around it &mdash; which is a different question, and the one underneath several of the others.</p>
+    </div>
+
+    <h3>What is durable and what is disposable</h3>
+
+    <p>Most of the confusion about specs, architecture and documentation dissolves once you separate artifacts by <strong>lifespan</strong> rather than by subject. Three categories, and almost every artifact belongs to exactly one:</p>
+
+    <div class="scroll">
+      <table>
+        <caption>Every artifact, by how long it is meant to live</caption>
+        <thead><tr><th>Category</th><th>Artifacts</th><th>Owner</th><th>Kept true by</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Durable<br><span style="font-weight:400;color:var(--ink-faint)">outlives every change</span></td>
+            <td>The system overview &middot; decision records &middot; the risk lane definitions &middot; the practice standard &middot; the known-bad list</td>
+            <td>The team, collectively</td>
+            <td><strong>Being small.</strong> Each is reviewed like code and none is long enough to rot unnoticed. If one starts changing weekly it is too detailed.</td>
+          </tr>
+          <tr>
+            <td class="k">Generated<br><span style="font-weight:400;color:var(--ink-faint)">rebuilt every commit</span></td>
+            <td>The interface schema and its client &middot; the catalogue of what exists &middot; the dependency graph &middot; coverage and duplication trends</td>
+            <td class="k">Nobody &mdash; it is derived</td>
+            <td><strong>Construction.</strong> It cannot be wrong, because it is read out of the code. CI fails if a committed copy has gone stale.</td>
+          </tr>
+          <tr>
+            <td class="k">Transient<br><span style="font-weight:400;color:var(--ink-faint)">alive for one change, then history</span></td>
+            <td>The specification &middot; the plan &middot; the task list &middot; the review record</td>
+            <td>Whoever is doing the change</td>
+            <td><strong>Nothing &mdash; deliberately.</strong> They are never updated after merge, so they cannot drift. Their scenarios move into the feature file for that capability and live on as tests; the document becomes a record of why.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="verdict">
+      <h3>The mistake this prevents</h3>
+      <p>Nearly every documentation problem in an engineering organisation is an artifact in the wrong row. <strong>A transient document treated as durable</strong> becomes a lie that people still trust. <strong>A durable document that should have been generated</strong> is wrong within a fortnight. <strong>A generated file that someone hand-edits</strong> stops being true and nothing announces it.</p>
+      <p>So the test for any new artifact is a single question: <em>how long is this meant to be true for?</em> The answer decides where it lives and who is responsible for it.</p>
+    </div>
+
+    <h3>Who does what</h3>
+
+    <p>Approvals are scattered through the pipeline by design &mdash; each one sits where the decision is. Collected in one place, the roles are:</p>
+
+    <div class="scroll">
+      <table>
+        <caption>Four roles, and where each one binds</caption>
+        <thead><tr><th>Role</th><th>Owns</th><th>Approves</th><th>Never</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Product</td>
+            <td>What gets built and why. The acceptance scenarios, in plain language.</td>
+            <td>The scenarios &mdash; which is a real gate, because those become the tests.</td>
+            <td>Writes the technical requirements, or approves an implementation.</td>
+          </tr>
+          <tr>
+            <td class="k">Engineer</td>
+            <td>The specification interview, the change itself, and reviewing others' changes.</td>
+            <td>Changes in their area, per the lane.</td>
+            <td>Approves their own work, or decides system-level architecture alone.</td>
+          </tr>
+          <tr>
+            <td class="k">Tech lead</td>
+            <td>The system overview, the risk lane definitions, and the architecture forum.</td>
+            <td>Requirements, decision records, and anything on the highest lane.</td>
+            <td>Becomes the only reviewer &mdash; that is how a bottleneck forms and it is hard to reverse.</td>
+          </tr>
+          <tr>
+            <td class="k">Quality<br><span style="font-weight:400;color:var(--ink-faint)">when it exists</span></td>
+            <td>The platform quality depends on, the measurement layer, and coaching.</td>
+            <td>Nothing. Deliberately.</td>
+            <td><strong>Writes the tests, runs regression, or acts as a release gate.</strong> The moment any of those transfers, ownership evaporates.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <span class="lbl">The specification interview belongs to an engineer</span>
+      <p>Not to an analyst, and this is worth being deliberate about. <strong>The value of that conversation is in the questions asked</strong> &mdash; what happens when the feed is late, what should explicitly not happen, does this need to survive a restart &mdash; and those come from knowing what the system can and cannot do.</p>
+      <p>An agent drafts the document. The engineer runs the interview. Product decides whether the answers are right.</p>
+    </div>
+
+    <h3>The rhythm</h3>
+
+    <p>Two recurring commitments, and everything else is continuous. That is the whole cadence.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>What is scheduled, and what simply flows</caption>
+        <thead><tr><th>When</th><th>What</th><th>Produces</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Weekly, ~an hour<br><span style="font-weight:400;color:var(--ink-faint)">architecture forum</span></td>
+            <td>The system-level problems that are nobody's ticket. <em>How do we send a fax. What happens when the upstream feed stops. Where does this new concept live.</em> Whoever has one brings it.</td>
+            <td><strong>Decision records</strong>, and occasionally an update to the system overview. This is the collective thinking, and it is the meeting to protect.</td>
+          </tr>
+          <tr>
+            <td class="k">Fortnightly, ~30 min<br><span style="font-weight:400;color:var(--ink-faint)">retrospective</span></td>
+            <td>Two standing questions: what did the tooling get wrong this time, and did anything ship that should have been caught earlier?</td>
+            <td><strong>An updated known-bad list</strong>, which the agent loads before generating &mdash; so the answer changes what gets written next time rather than being a discussion.</td>
+          </tr>
+          <tr>
+            <td class="k">Monthly, one slide<br><span style="font-weight:400;color:var(--ink-faint)">spend review</span></td>
+            <td>Total, per engineer, per merged change, and what moved. One named owner.</td>
+            <td>A number that stays defensible, which is the failure this whole plan is most exposed to.</td>
+          </tr>
+          <tr>
+            <td class="k">Continuous</td>
+            <td>Everything else. Specification conversations happen when a piece of work starts. Reviews happen when a change is ready.</td>
+            <td>&mdash;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note good">
+      <span class="lbl">What is deliberately absent</span>
+      <p>No sprint planning, no estimation ritual, no stand-up whose purpose is status. <strong>Status is visible in the pipeline</strong> &mdash; every change has a state, a lane and a stage, and reading it is faster than asking. A daily meeting to recite what a dashboard already says is the ceremony this design exists to remove.</p>
+      <p>Keep a short daily contact if the team wants one, but let it be for <em>blockers and offers of help</em>, not for reporting.</p>
+    </div>
+
+    <h3>How concurrent work stays coherent</h3>
+
+    <p>This is the question underneath &ldquo;how do we relate changes&rdquo;, and it is a fair challenge: with no analysis meeting, two engineers can be working on adjacent things with nothing forcing them to notice each other.</p>
+
+    <p><strong>Four mechanisms, none of which is a meeting.</strong></p>
+
+    <div class="scroll">
+      <table>
+        <caption>Coordination without a coordination ritual</caption>
+        <thead><tr><th>Risk</th><th>What catches it</th><th>When</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Two people build the same thing</td>
+            <td><strong>The reuse stage.</strong> It reads a catalogue regenerated every commit, so work merged this morning is discoverable this afternoon. This is the mechanism doing most of the work here, and it is why the catalogue is generated rather than hand-maintained.</td>
+            <td>Before either writes code</td>
+          </tr>
+          <tr>
+            <td class="k">Two changes touch the same code</td>
+            <td>Version control. It is a merge concern and it always was &mdash; an analysis meeting never actually prevented this, it just made people feel briefed.</td>
+            <td>At merge</td>
+          </tr>
+          <tr>
+            <td class="k">One change breaks another's assumptions</td>
+            <td><strong>Contract tests and breaking-change detection</strong> on the published interface. The machine says so at the moment it happens, which is considerably better than someone remembering a conversation from a fortnight ago.</td>
+            <td>In CI, immediately</td>
+          </tr>
+          <tr>
+            <td class="k">Two changes are individually fine and jointly wrong</td>
+            <td class="k">A person. Specifically the architecture forum, and the tech lead holding the system overview.</td>
+            <td>Weekly &mdash; <strong>this is the one that genuinely needs the meeting</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The honest cost of automating the breakdown</span>
+      <p>An analysis phase produced two things, and only one of them was task cards. The other was <strong>shared understanding</strong> &mdash; a team that decomposes a feature together ends up knowing that feature, including the parts they did not personally build.</p>
+      <p>Automating the decomposition gets you the cards without the side effect. <strong>That is a real loss and it should be named rather than waved past</strong>, because it shows up later as nobody being able to cover for anyone else.</p>
+      <p>Three things offset it, and they need to be deliberate rather than hoped for: <strong>reviewers come from the owning area</strong>, so people read work they did not write · <strong>approval requires writing a sentence about the change</strong>, which cannot be done without understanding it · and <strong>the architecture forum is genuinely collective</strong>, so the decisions that shape a feature are made by more than one person even when the implementation is not.</p>
+      <p>Watch for the symptom: <em>one person is the only one who can answer questions about an area.</em> That is the failure, and reviewer rotation is the cheapest fix.</p>
+    </div>
+  </section>
+
+
+
+<!-- ==================== 09 ==================== -->
+<section id="shape">
+  <div class="sh">
+    <span class="eyebrow">The model</span>
+    <h2>The pipeline, in short</h2>
+    <p>Eleven stages. Two need a person, plus a third that fires only when a change would affect another team.</p>
+  </div>
+
+  <div class="flowwrap">
+    <div class="flow">
+      <div class="fn auto"><b>1 Triage</b>risk, size</div>
+      <div class="fn auto"><b>2 Reuse</b>does it exist?</div>
+      <div class="fn gate"><b>3 Spec</b>person</div>
+      <div class="fn"><b>4 Design</b>plan</div>
+      <div class="fn gate"><b>5 Contract</b>if shared</div>
+      <div class="fn auto"><b>6 Tasks</b>break down</div>
+      <div class="fn auto"><b>7 Build</b>write it</div>
+      <div class="fn auto"><b>8 Verify</b>tests, review</div>
+      <div class="fn gate"><b>9 Review</b>person</div>
+      <div class="fn auto"><b>10 Staging</b>end to end</div>
+      <div class="fn auto"><b>11 Deploy</b>dark, flagged</div>
+    </div>
+  </div>
+  <p class="fkey"><span><i class="a"></i> Automated</span><span><i class="g"></i> Human gate</span><span>Unmarked runs conditionally</span></p>
+
+  <div class="verdict">
+    <h3>One rule decides every gate: automate by reversibility, gate by irreversibility</h3>
+    <p>A step runs unattended if undoing it is cheap, and needs a person if undoing it is expensive. That turns "how much do we trust the agent?" — which has no answer and gets settled by whoever is most senior — into "how good is our undo?", which is something you build and measure.</p>
+    <p>It also means gates disappear on their own merits as reversibility improves, rather than accumulating forever because removing one requires arguing for less caution.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>The three stages worth understanding</caption>
+      <thead><tr><th>Stage</th><th>What it does</th><th>Why it exists</th></tr></thead>
+      <tbody>
+        <tr><td class="k">2 · Reuse check</td><td>Every capability the request needs is mapped to <em>reuse</em>, <em>extend</em>, or <em>new, and here is what I checked</em>. An unjustified "new" fails the stage.</td><td>The one that stops the codebase rotting. Duplication rose 81% and refactoring fell 70% across 623 million AI-assisted changes — new code is always the path of least resistance.</td></tr>
+        <tr><td class="k">3 · Specification <span class="tag t-no">Gate</span></td><td>A person interviews product with the agent's help. Scenarios become the tests.</td><td>41.8% of agent failures start in the specification. A wrong requirement is faithfully built, tested and shipped.</td></tr>
+        <tr><td class="k">9 · Review <span class="tag t-no">Gate</span></td><td>A person reads the change and approves by writing one sentence on what changed and why. A bare click is rejected.</td><td>Comprehension, not bug-catching — machines are better at bugs. The risk is shipping something nobody can explain when it breaks.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+    <h3>The four risk lanes, since everything above refers to them</h3>
+
+    <p>A lane is assigned <strong>automatically from the files a change touches</strong>, never from what the author claims about it. That is the whole mechanism &mdash; self-declared risk is always low.</p>
+    <figure class="dg">
+      <svg viewBox="0 0 780 296" role="img" aria-label="Four horizontal bars of increasing length, one per risk lane. Lane 1 passes automated checks only and ships. Lane 2 adds machine review and one human reviewer. Lane 3 adds a second reviewer and a security review. Lane 4 adds a named human approval before release.">
+        <defs>
+          <marker id="dg2-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- column headers -->
+        <text x="215" y="34" text-anchor="middle" class="dg-tm">AUTO CHECKS</text>
+        <text x="330" y="34" text-anchor="middle" class="dg-tm">AI REVIEW</text>
+        <text x="445" y="34" text-anchor="middle" class="dg-tm">1 REVIEWER</text>
+        <text x="560" y="34" text-anchor="middle" class="dg-tm">2ND + SECURITY</text>
+        <text x="675" y="34" text-anchor="middle" class="dg-tm">NAMED APPROVAL</text>
+        <line x1="190" y1="44" x2="712" y2="44" class="dg-dash"/>
+
+        <!-- lane 1 -->
+        <text x="172" y="86" text-anchor="end" class="dg-tb">Lane 1 &middot; Cosmetic</text>
+        <rect x="190" y="70" width="56" height="22" rx="2" class="dg-accbox"/>
+        <circle cx="215" cy="81" r="6" class="dg-accf"/>
+        <text x="268" y="86" class="dg-ta">ships on green</text>
+
+        <!-- lane 2 -->
+        <text x="172" y="140" text-anchor="end" class="dg-tb">Lane 2 &middot; Standard</text>
+        <rect x="190" y="124" width="286" height="22" rx="2" class="dg-accbox"/>
+        <circle cx="215" cy="135" r="6" class="dg-accf"/>
+        <circle cx="330" cy="135" r="6" class="dg-accf"/>
+        <circle cx="445" cy="135" r="6" class="dg-accf"/>
+
+        <!-- lane 3 -->
+        <text x="172" y="194" text-anchor="end" class="dg-tb">Lane 3 &middot; Sensitive</text>
+        <rect x="190" y="178" width="401" height="22" rx="2" class="dg-accbox"/>
+        <circle cx="215" cy="189" r="6" class="dg-accf"/>
+        <circle cx="330" cy="189" r="6" class="dg-accf"/>
+        <circle cx="445" cy="189" r="6" class="dg-accf"/>
+        <circle cx="560" cy="189" r="6" class="dg-accf"/>
+
+        <!-- lane 4 -->
+        <text x="172" y="248" text-anchor="end" class="dg-tb">Lane 4 &middot; Clinical</text>
+        <rect x="190" y="232" width="516" height="22" rx="2" class="dg-accbox"/>
+        <circle cx="215" cy="243" r="6" class="dg-accf"/>
+        <circle cx="330" cy="243" r="6" class="dg-accf"/>
+        <circle cx="445" cy="243" r="6" class="dg-accf"/>
+        <circle cx="560" cy="243" r="6" class="dg-accf"/>
+        <circle cx="675" cy="243" r="6" class="dg-accf"/>
+
+        <!-- routing note -->
+        <text x="190" y="284" class="dg-tf">Assigned from the files a change touches &mdash; never from what the author claims.</text>
+      </svg>
+      <figcaption><b>A lane is not a label on a change. It is how much of the pipeline that change has to traverse.</b> The same eleven stages run for everything; the lane decides how many controls sit on top &mdash; which is what lets scarce review capacity land where consequences are real instead of being spread evenly across copy fixes and clinical logic.</figcaption>
+    </figure>
+
+
+
+    <div class="scroll">
+      <table>
+        <caption>How much process a change gets</caption>
+        <thead><tr><th>Lane</th><th>Typical change</th><th>What it gets</th></tr></thead>
+        <tbody>
+          <tr><td class="k">1 &middot; Cosmetic</td><td>Copy, configuration, logging, documentation.</td><td>Automated checks only. <strong>Ships on green, no human in the path</strong> &mdash; this is the lane that pays for the whole scheme.</td></tr>
+          <tr><td class="k">2 &middot; Standard</td><td>Ordinary feature work.</td><td>Automated checks, machine review, then one human reviewer.</td></tr>
+          <tr><td class="k">3 &middot; Sensitive</td><td>Authentication, personal data, anything with a database migration.</td><td>All of the above plus a <strong>second reviewer</strong>, a security review, and an explicit rollback plan.</td></tr>
+          <tr><td class="k">4 &middot; Clinical</td><td>Member data, clinical logic.</td><td>Everything in Lane 3 plus a <strong>named human approval before release</strong>. <em>Rollback restores the system, not the person.</em></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The rules need a team-size clause, stated now rather than discovered</span>
+      <p>Four rules elsewhere in this design are individually sensible and collectively impossible at eight engineers: one owning team per module, teams review their own code, Lane 3 needs two reviewers from the owning team, and reviewers rotate within the team. Split eight people across three surfaces and an owning team is two or three &mdash; so &ldquo;two from the owning team&rdquo; means everyone reviews everything, and rotation has nothing to rotate between.</p>
+      <p><strong>Below roughly fifteen engineers:</strong> one reviewer from the owning area, and Lane 3&rsquo;s second reviewer comes from anywhere in engineering. Rotation is an aspiration rather than a rule. Above fifteen, the rules apply as written.</p>
+      <p>This matters more than it looks, because <strong>a control that cannot be satisfied gets quietly ignored &mdash; and the habit of ignoring it survives the growth that made it satisfiable.</strong></p>
+    </div>
+
+
+  <div class="note">
+    <span class="lbl">Where it runs</span>
+    <p><strong>Two stages on a developer's machine, nine headless in CI.</strong> Specification and review are interactive because they need a conversation. Everything else runs on a trigger with nobody waiting, which is what makes it cheap and auditable.</p>
+  </div>
+</section>
+
+<!-- ==================== 10 ==================== -->
+<section id="cost">
+  <div class="sh">
+    <span class="eyebrow">Money</span>
+    <h2>What it costs</h2>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Monthly run rate, everything included</caption>
+      <thead><tr><th>Line</th><th>8 engineers</th><th>25 engineers</th></tr></thead>
+      <tbody>
+        <tr><td class="k">GitHub Enterprise Cloud</td><td class="n">~$170</td><td class="n">~$525</td></tr>
+        <tr><td class="k">CI minutes over the allowance</td><td class="n">~$40</td><td class="n">~$250</td></tr>
+        <tr><td class="k">Claude seats, for people</td><td class="n">$160–1,000</td><td class="n">$500–3,100</td></tr>
+        <tr><td class="k">Claude usage, for the pipeline</td><td class="n">~$1,400</td><td class="n">~$4,500</td></tr>
+        <tr><td class="k">Azure, all environments <span style="font-weight:400;color:var(--ink-faint)">— least certain</span></td><td class="n">~$1,500</td><td class="n">~$5,000</td></tr>
+        <tr><td class="k">Observability and error tracking</td><td class="n">~$30</td><td class="n">~$200</td></tr>
+        <tr><td class="k">Every other tool in the stack</td><td class="n">$0</td><td class="n">$0</td></tr>
+        <tr><td class="k"><strong>Per engineer, per month</strong></td><td class="n"><strong>~$410–520</strong></td><td class="n"><strong>~$440–545</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>Roughly $410–545 per engineer per month — about 4–7% of a loaded engineer</h3>
+    <p>Quote the range rather than a single figure; the ratio moves with where someone sits in the salary band. Almost everything in the stack is free and open source, so the bill is model usage and hosting and everything else is rounding.</p>
+    <p>Per feature, the AI costs about <strong>$30–45</strong>, with a hard ceiling enforced across the whole run rather than per step.</p>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">The failure to design against is not overspending</span>
+    <p>The best-documented failure in this field is a company that measured a real productivity gain and cancelled anyway. Five thousand engineers lost the tooling despite that same company's study showing a 24% throughput improvement — because they piloted on flat-rate licensing, the real number arrived all at once, and nobody could defend it against a budget set before anyone knew what it would be.</p>
+    <p><strong>They had the money. They lost the argument.</strong> So one named person owns the total monthly bill from the first month, and cost per merged change is the metric — because it is attributable and it trends.</p>
+  </div>
+
+  <div class="note">
+    <span class="lbl">Quote the cloud line separately</span>
+    <p>It is a shape, not a quote — nobody has modelled the workload, and it is the only figure here that could move by a factor of two. About two-thirds of the per-engineer number is indifferent to it. Say <em>"roughly $150–250 per engineer for tooling and AI, plus hosting, which is load-dependent"</em> — a single blended number invites a challenge on the part you can least defend.</p>
+  </div>
+</section>
+
+<!-- ==================== 11 ==================== -->
+<section id="open">
+  <div class="sh">
+    <span class="eyebrow">Honest state</span>
+    <h2>What is still open</h2>
+    <p>Shorter than it was. Two of these need a decision from someone else, and two need work nobody has started.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Open questions, with what would close each</caption>
+      <thead><tr><th>Question</th><th>Owner</th><th>What closes it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">How much of the existing codebase survives</td>
+          <td>The salvage review</td>
+          <td>Three to five days, timeboxed, written up with a recommendation per layer. <strong>Assess domain knowledge, integrations, application code and infrastructure separately</strong> — they have different answers, and the common good outcome is "rebuild the application, keep the domain knowledge and the integrations".</td>
+        </tr>
+        <tr>
+          <td class="k">The release cadence clinicians actually see</td>
+          <td>Product</td>
+          <td>A conversation, not a technical decision. Engineering needs one thing from it: <strong>that the answer constrains release and not deploy.</strong></td>
+        </tr>
+        <tr>
+          <td class="k">How many application repositories there really are</td>
+          <td>Quick audit</td>
+          <td>An afternoon. Almost certainly single digits once infrastructure is excluded, which makes the monorepo destination trivially achievable.</td>
+        </tr>
+        <tr>
+          <td class="k">Whether a design firm builds the component library</td>
+          <td>Commercial</td>
+          <td>Four conditions belong in the brief if so, and one has a procurement lead time — an external firm may not be able to work directly in the repositories depending on how identity is configured.</td>
+        </tr>
+        <tr>
+          <td class="k">Whether models get self-hosted</td>
+          <td>Deferred</td>
+          <td>Not now. Revisit when spend is stable enough to forecast against a modelled workload. Keep the three interfaces in section 03 abstract in the meantime and the option stays cheap.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>What would be first, if the answer is yes</h3>
+    <p>Nothing on this list blocks the start. Every day-one item is a setting, a schema or a page of writing — and <strong>two of them cannot be recovered later at any price</strong> &mdash; recording that a change was AI-authored, and the telemetry joins that connect a defect back to the change that caused it. <strong>Two more are unrecoverable in practice</strong> rather than in principle: compiler strictness, because nobody enables it against a year of existing code, and flag lifecycle rules, because nobody audits two hundred existing flags.</p>
+    <p>Both are free today and neither needs a decision from anyone. That is where week one goes, and the build order is document 03.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Document 02 of 03 · Research (01) sets out the evidence behind every claim here · Implementation (03) is the build order, the standards and the controls · The original full plan remains available and searchable for anything this summarises</p>
+</footer>
+
+</div>
+</body>
+</html>

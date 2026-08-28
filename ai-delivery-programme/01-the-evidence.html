@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>The Evidence</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#F1F0ED; --surface:#FFFFFF; --sunk:#E7E5E1;
+    --ink:#1A1A1E; --ink-soft:#4A4A54; --ink-faint:#6A6A76;
+    --rule:#D8D6D2; --rule-soft:#E6E4E0;
+    --accent:#1F4E79; --accent-soft:#DEE8F1;
+    --good:#2C6446; --good-soft:#DCEAE1;
+    --warn:#8A5A15; --warn-soft:#F3E7D3;
+    --crit:#93313A; --crit-soft:#F4DFE1;
+
+    --display:'Newsreader',Georgia,'Times New Roman',serif;
+    --body:'Libre Franklin','Helvetica Neue',Helvetica,Arial,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --measure:68ch;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#14151A; --surface:#1C1D24; --sunk:#23252E;
+      --ink:#E8E8EE; --ink-soft:#AFB1BD; --ink-faint:#8D90A0;
+      --rule:#2E313B; --rule-soft:#262932;
+      --accent:#6FA8DC; --accent-soft:#152532;
+      --good:#6FBE95; --good-soft:#152720;
+      --warn:#D6A55A; --warn-soft:#2A2214;
+      --crit:#DE858D; --crit-soft:#2C1A1C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#14151A; --surface:#1C1D24; --sunk:#23252E;
+    --ink:#E8E8EE; --ink-soft:#AFB1BD; --ink-faint:#8D90A0;
+    --rule:#2E313B; --rule-soft:#262932;
+    --accent:#6FA8DC; --accent-soft:#152532;
+    --good:#6FBE95; --good-soft:#152720;
+    --warn:#D6A55A; --warn-soft:#2A2214;
+    --crit:#DE858D; --crit-soft:#2C1A1C;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--body); font-size:17px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:940px; margin:0 auto; padding:0 26px 110px;}
+
+  .family{
+    display:flex; flex-wrap:wrap; gap:0; border-bottom:1px solid var(--rule);
+    margin:0 -26px; padding:0 26px; background:var(--surface);
+  }
+  .family a, .family span{
+    font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.09em;
+    text-transform:uppercase; padding:13px 18px 12px; text-decoration:none;
+    color:var(--ink-faint); border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .family .here{color:var(--accent); border-bottom-color:var(--accent); font-weight:600;}
+  .family a:hover{color:var(--ink);}
+  .family a:focus-visible{outline:2px solid var(--accent); outline-offset:-3px;}
+  .family .soon{opacity:.5;}
+
+  .mast{padding:56px 0 34px; border-bottom:2px solid var(--ink);}
+  .mast .num{
+    font-family:var(--mono); font-size:11.5px; font-weight:600; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--accent); margin:0 0 16px;
+  }
+  .mast h1{
+    font-family:var(--display); font-weight:600; font-size:clamp(38px,6.5vw,62px);
+    line-height:1.02; letter-spacing:-.02em; margin:0 0 20px; max-width:15ch;
+    text-wrap:balance;
+  }
+  .mast .sf{font-size:19px; line-height:1.55; color:var(--ink-soft); max-width:58ch; margin:0;}
+  .mast .meta{
+    display:flex; flex-wrap:wrap; gap:7px 22px; margin-top:22px;
+    font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.04em;
+  }
+
+  .contents{columns:2 250px; column-gap:40px; margin:34px 0 66px;}
+  .contents a{
+    display:block; break-inside:avoid; padding:11px 2px; text-decoration:none;
+    border-bottom:1px solid var(--rule); color:var(--ink);
+    font-size:14.5px; font-weight:500;
+  }
+  .contents a:hover{color:var(--accent); border-bottom-color:var(--accent);}
+  .contents a:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .contents .cn{
+    font-family:var(--mono); font-size:10.5px; font-weight:600; color:var(--accent);
+    margin-right:12px; font-variant-numeric:tabular-nums;
+  }
+
+  section{margin:0 0 70px; scroll-margin-top:20px;}
+  .sh{border-top:2px solid var(--ink); padding-top:14px; margin-bottom:26px;}
+  .sh .eyebrow{
+    font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent); display:block; margin-bottom:10px;
+  }
+  h2{
+    font-family:var(--display); font-weight:600; font-size:clamp(27px,3.6vw,36px);
+    line-height:1.1; letter-spacing:-.015em; margin:0; max-width:24ch; text-wrap:balance;
+  }
+  .sh p{margin:12px 0 0; color:var(--ink-soft); font-size:17px; max-width:var(--measure);}
+  h3{
+    font-family:var(--body); font-weight:700; font-size:16.5px; letter-spacing:-.005em;
+    margin:34px 0 11px; color:var(--ink);
+  }
+  p{margin:0 0 15px; max-width:var(--measure);}
+  strong{font-weight:600; color:var(--ink);}
+  ul,ol{margin:0 0 16px; padding-left:23px; max-width:var(--measure);}
+  li{margin-bottom:8px;}
+  li::marker{color:var(--ink-faint);}
+  code{
+    font-family:var(--mono); font-size:.85em; background:var(--sunk);
+    padding:1px 5px; border:1px solid var(--rule-soft); overflow-wrap:anywhere;
+  }
+  a{color:var(--accent);}
+
+  .note{
+    background:var(--surface); border:1px solid var(--rule);
+    border-left:3px solid var(--ink-faint); padding:15px 18px; margin:20px 0;
+  }
+  .note.good{border-left-color:var(--good);}
+  .note.warn{border-left-color:var(--crit);}
+  .note .lbl{
+    display:block; font-family:var(--mono); font-size:10px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px;
+  }
+  .note.good .lbl{color:var(--good);}
+  .note.warn .lbl{color:var(--crit);}
+  .note p{font-size:16px; margin:0 0 10px; max-width:64ch;}
+  .note p:last-child{margin-bottom:0;}
+
+  .verdict{
+    background:var(--accent-soft); border:1px solid var(--accent);
+    padding:20px 22px; margin:22px 0;
+  }
+  .verdict h3{
+    font-family:var(--display); font-weight:600; font-size:20px; line-height:1.25;
+    color:var(--accent); margin:0 0 10px; letter-spacing:-.01em;
+  }
+  .verdict p{font-size:16.5px; margin:0 0 11px; max-width:64ch;}
+  .verdict p:last-child{margin-bottom:0;}
+
+  .scroll{overflow-x:auto; margin:20px 0; border:1px solid var(--rule); background:var(--surface);}
+  table{border-collapse:collapse; width:100%; min-width:560px; font-size:14px; line-height:1.5;}
+  caption{
+    caption-side:top; text-align:left; font-family:var(--mono); font-size:10px;
+    font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-faint); padding:14px 16px 10px;
+  }
+  th{
+    text-align:left; font-family:var(--mono); font-size:10px; font-weight:600;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--ink-faint);
+    padding:9px 16px; border-bottom:2px solid var(--ink); vertical-align:bottom; white-space:nowrap;
+  }
+  td{padding:12px 16px; border-bottom:1px solid var(--rule-soft); vertical-align:top; color:var(--ink-soft);}
+  tbody tr:last-child td{border-bottom:none;}
+  td.k{color:var(--ink); font-weight:600;}
+  td.n{font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap; font-size:13px;}
+
+  .tag{
+    font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.1em;
+    text-transform:uppercase; padding:3px 8px; display:inline-block; white-space:nowrap;
+  }
+  .t-yes{background:var(--good-soft); color:var(--good);}
+  .t-open{background:var(--warn-soft); color:var(--warn);}
+  .t-no{background:var(--crit-soft); color:var(--crit);}
+  .t-info{background:var(--accent-soft); color:var(--accent);}
+
+  .srcs{list-style:none; padding:0; margin:0; font-size:14px; line-height:1.55;}
+  .srcs li{margin-bottom:11px; color:var(--ink-soft); max-width:78ch;}
+  .srcs b{color:var(--ink); font-weight:600;}
+
+  footer{border-top:2px solid var(--ink); padding-top:22px; margin-top:16px;}
+  footer p{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:.03em; max-width:70ch; line-height:1.7;}
+
+  @media (max-width:620px){
+    body{font-size:16px;}
+    .wrap{padding:0 18px 80px;}
+    .family{margin:0 -18px; padding:0 18px;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="family" aria-label="Document set">
+  <span class="here">01 The Evidence</span>
+  <a href="02-the-plan.html">02 The Plan</a>
+  <a href="03-implementation.html">03 Implementation</a>
+</nav>
+
+<header class="mast">
+  <p class="num">Document 01 of 03</p>
+  <h1>The Evidence</h1>
+  <p class="sf">Why any of this is worth doing, what the research actually shows including where it contradicts itself, and which numbers survive being checked.</p>
+  <div class="meta">
+    <span>~15 minutes</span>
+    <span>Every figure marked for provenance</span>
+    <span>Read this if a claim gets challenged</span>
+  </div>
+</header>
+
+<nav class="contents" aria-label="Contents">
+  <a href="#gap"><span class="cn">01</span>Everyone is trying. Almost nobody has scaled it.</a>
+  <a href="#conflict"><span class="cn">02</span>The two studies that disagree</a>
+  <a href="#code"><span class="cn">03</span>What happens to the code</a>
+  <a href="#bottleneck"><span class="cn">04</span>Where the constraint moves</a>
+  <a href="#agents"><span class="cn">05</span>How agents actually fail</a>
+  <a href="#cost"><span class="cn">06</span>What kills these programmes</a>
+  <a href="#provenance"><span class="cn">07</span>What is verified, and what isn't</a>
+  <a href="#sources"><span class="cn">08</span>Sources</a>
+</nav>
+
+<!-- ==================== 01 ==================== -->
+<section id="gap">
+  <div class="sh">
+    <span class="eyebrow">The opportunity</span>
+    <h2>Everyone is trying. Almost nobody has scaled it.</h2>
+    <p>Two things are true at once, and the distance between them is the entire argument for doing this deliberately.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Where the industry actually is</caption>
+      <thead><tr><th>Measure</th><th>Figure</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Software professionals using AI at work</td><td class="n">90%</td><td>DORA 2025 — up 14 points year on year</td></tr>
+        <tr><td class="k">Organisations pursuing AI in quality engineering</td><td class="n">~90%</td><td>Capgemini 2025–26</td></tr>
+        <tr><td class="k">Those capabilities actually running in production</td><td class="n">~37%</td><td>Capgemini 2025–26</td></tr>
+        <tr><td class="k">Reached enterprise-scale deployment</td><td class="n">15%</td><td>Capgemini 2025–26</td></tr>
+        <tr><td class="k">Adopted the tools faster than they wrote any policy</td><td class="n">80%</td><td>CTO survey 2026</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>Nine in ten are trying. Fewer than one in six have scaled it.</h3>
+    <p>That gap is not a capability problem — the models are the same ones everybody has. It is a <strong>process and evidence problem</strong>, which is why the investment goes into the delivery process rather than the tooling.</p>
+    <p>The last row is the sharpest: <strong>four in five organisations adopted the tools before they wrote the policy.</strong> Starting from nothing means doing it the other way round, and that advantage expires roughly eighteen months from the first commit.</p>
+  </div>
+
+  <h3>The amplifier thesis, and why it is not a slogan</h3>
+
+  <p>DORA's 2025 framing is that AI <em>amplifies</em> an organisation's existing strengths and weaknesses rather than adding capability independently. Good process gets faster; bad process gets faster at producing problems.</p>
+
+  <p>What makes that more than a nice phrase is the list underneath it. DORA identified seven capabilities that determine whether AI accelerates outcomes or accelerates chaos:</p>
+
+  <ul>
+    <li>A clear, communicated position on what AI may be used for</li>
+    <li>Healthy data ecosystems</li>
+    <li>Internal data an agent can actually reach</li>
+    <li>Strong version control practices</li>
+    <li>Working in small batches</li>
+    <li>User-centric focus</li>
+    <li>Quality internal platforms</li>
+  </ul>
+
+  <div class="note good">
+    <span class="lbl">The observation worth repeating in a room</span>
+    <p><strong>Five of the seven are ordinary engineering hygiene.</strong> Nothing about model choice, prompt technique or tool selection appears anywhere on the list.</p>
+    <p>That is what "amplifier, not lever" means in practice — and it is why the quality strategy and the AI strategy turn out to be the same strategy.</p>
+  </div>
+</section>
+
+<!-- ==================== 02 ==================== -->
+<section id="conflict">
+  <div class="sh">
+    <span class="eyebrow">The headline</span>
+    <h2>The two studies that disagree</h2>
+    <p>These are the most rigorous measurements available and they point in opposite directions. Reconciling them tells you where gains will actually come from.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Both sound, both measuring something different</caption>
+      <thead><tr><th>Study</th><th>Method</th><th>Result</th><th>What it cannot tell you</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">METR<br><span style="font-weight:400;color:var(--ink-faint)">July 2025</span></td>
+          <td>Randomised controlled trial. 16 experienced open-source developers, 246 real tasks, their own repositories.</td>
+          <td class="n">−19% speed<br><span style="color:var(--ink-faint)">+20% perceived</span></td>
+          <td>Expert developers on mature code they knew intimately. METR itself now labels the result historical.</td>
+        </tr>
+        <tr>
+          <td class="k">Microsoft<br><span style="font-weight:400;color:var(--ink-faint)">July 2026</span></td>
+          <td>Direct telemetry, not surveys. Tens of thousands of engineers, four-month window, synthetic control with placebo testing.</td>
+          <td class="n">~24% more<br><span style="color:var(--ink-faint)">merged PRs</span></td>
+          <td>Counts merged pull requests, not what is inside them. Microsoft alone, on one platform.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Reconciling them</h3>
+
+  <p>METR studied <strong>experts working on code they already knew intimately.</strong> In that setting the developer's mental model is already better than anything an agent can reconstruct, so prompting and reviewing is pure overhead. Microsoft studied a <strong>broad population across unfamiliar surfaces</strong>, a year later, with better tooling.</p>
+
+  <p>The Microsoft data supports that reading from the inside. The effect was <strong>dose-responsive</strong> — from about +15% at three days a week to +50% at five or more. Junior engineers and long-tenured staff saw the largest lifts. And senior individual contributors, the population most like METR's subjects, <strong>adopted at high rates but retained at close to zero</strong>. They tried it and stopped.</p>
+
+  <div class="verdict">
+    <h3>What follows for a codebase being built from scratch</h3>
+    <p>With no legacy mental models to compete with, we sit firmly in the population where gains appear. Two caveats travel with that, and both matter more than the headline.</p>
+    <p><strong>Our most senior people may genuinely be slower on the work they know best.</strong> Do not mandate uniform usage — it costs credibility with exactly the people whose support matters most.</p>
+    <p><strong>Microsoft measured merged pull requests. The next section measures what is inside them.</strong> Optimising the first without watching the second is how you buy throughput with maintainability.</p>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">The finding that should change how you argue for this</span>
+    <p>Developers in the METR trial believed they were <strong>20% faster</strong> while being measured 19% slower. The paper also records a 24% forecast made <em>before</em> the study.</p>
+    <p><strong>Never justify this programme on developer sentiment.</strong> Self-reported productivity was measured as inverted, and it is the easiest evidence to gather and the least worth having.</p>
+  </div>
+</section>
+
+<!-- ==================== 03 ==================== -->
+<section id="code">
+  <div class="sh">
+    <span class="eyebrow">Durability</span>
+    <h2>What happens to the code</h2>
+    <p>The volume goes up. This is what the volume is made of.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>623 million code changes analysed, 2023–2026</caption>
+      <thead><tr><th>Signal</th><th>Direction</th><th>Reading</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Duplicated code blocks</td><td class="n">+81%</td><td>Agents rewrite rather than reuse — writing new code always looks like the smaller change</td></tr>
+        <tr><td class="k">Copy-paste within a commit</td><td class="n">+41%</td><td><strong>Copy-pasted lines now exceed refactored lines for the first time on record</strong></td></tr>
+        <tr><td class="k">Error-masking constructs</td><td class="n">+47%</td><td>Empty catches and swallowed errors — the "make it pass" instinct</td></tr>
+        <tr><td class="k">Two-week code churn</td><td class="n">+15%<br><span style="color:var(--ink-faint)">+39% in AI-heavy projects</span></td><td><strong>The single best signal available.</strong> Code merged and then rewritten because it was never right — and computable from version history alone</td></tr>
+        <tr><td class="k">Cross-file function calls</td><td class="n">−35%</td><td>Reuse declining</td></tr>
+        <tr><td class="k">Refactoring line moves</td><td class="n">−70%</td><td>Nobody is tidying up</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>None of this is visible without instrumentation, and none of it shows up in a sprint. It is a slow failure, which is precisely why a duplication threshold and a churn measurement belong in the pipeline from the first commit rather than the first crisis.</p>
+
+  <h3>Security</h3>
+
+  <p>Two studies, two different numbers, and the gap between them is methodological rather than contradictory.</p>
+
+  <ul>
+    <li><strong>Roughly one in four.</strong> 534 samples across six frontier models tested against the standard web risk list; about <strong>25%</strong> contained a <em>confirmed</em> vulnerability. Best model 19.1%, worst 29.2%. <strong>Server-side request forgery was the single most common class</strong> — models routinely generate outbound calls that accept a caller-supplied address without validating it.</li>
+    <li><strong>Roughly one in two.</strong> A separate study found <strong>45%</strong> of samples <em>failed a security test</em> — a looser measure. Log injection failed 88% of the time, cross-site scripting 86%.</li>
+    <li><strong>Why they differ:</strong> "confirmed vulnerability" is a much higher bar than "failed a test". The honest reading is a floor of one in four and a plausible ceiling near one in two.</li>
+  </ul>
+
+  <p>Two supporting figures: <strong>56% of organisations</strong> report a security incident at least partly attributable to AI-generated code, and time-to-detect for an AI-introduced vulnerability runs about <strong>42 days longer</strong> than for human-written code — because existing tooling was not designed for the patterns AI produces.</p>
+
+  <div class="note">
+    <span class="lbl">How to use these numbers</span>
+    <p><strong>Lead with 25%.</strong> A claim that survives scrutiny is worth more than a bigger one that invites an argument about methodology — and the conclusion is identical at either figure: too high to leave to human review alone.</p>
+    <p>It is also why the security reviewer is a separate agent rather than an instruction to the code reviewer, and why it is weighted toward the classes that actually appear rather than spreading attention evenly.</p>
+  </div>
+</section>
+
+<!-- ==================== 04 ==================== -->
+<section id="bottleneck">
+  <div class="sh">
+    <span class="eyebrow">The constraint</span>
+    <h2>Where the constraint moves</h2>
+    <p>This is the most decision-relevant evidence in the document. Almost every design choice descends from it.</p>
+  </div>
+
+  <ul>
+    <li>Telemetry from <strong>more than ten thousand developers</strong>: <strong>98% more pull requests opened, 91% longer review times, and flat delivery metrics.</strong> Twice the work going in, the same value coming out.</li>
+    <li>Agent-opened pull requests wait <strong>5.3× longer</strong> to be picked up than unassisted ones. AI-assisted ones wait 2.47× longer.</li>
+    <li>Feature-branch throughput rose <strong>59% year on year</strong> while throughput on the main branch actually <em>fell</em>. Main-branch success rates dropped to 70.8%.</li>
+    <li>Output per engineer rose roughly 60% between 2025 and 2026, while a reviewer still handles the same number of changes they always did.</li>
+  </ul>
+
+  <div class="verdict">
+    <h3>Generation is nearly free. Review is not.</h3>
+    <p>The first bullet is the clearest single statement of the problem: <strong>twice the input, no change in output.</strong> The extra volume landed entirely on the one part of the process that did not get faster — a person reading it.</p>
+    <p>So the design test for anything proposed is: <em>does this make review cheaper, or does it add to the queue?</em> Risk lanes, size caps, machine review before any human sees a change, and automated rollback all exist for that one reason.</p>
+    <p><strong>Anything that raises generation without raising review throughput makes the organisation slower, not faster.</strong></p>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">The direct consequence for how we work</span>
+    <p>This is the evidence against running several agent sessions per developer in parallel. It is a real technique and it works — but it multiplies input to the stage that is already the constraint. <strong>Fix review throughput first, then scale generation into the headroom you created.</strong> Doing it the other way round is how the 98% number happens.</p>
+  </div>
+</section>
+
+<!-- ==================== 05 ==================== -->
+<section id="agents">
+  <div class="sh">
+    <span class="eyebrow">Agent design</span>
+    <h2>How agents actually fail</h2>
+    <p>There is a taxonomy for this, built from real execution traces, and it argues against the most popular way of organising agents.</p>
+  </div>
+
+  <p>Berkeley researchers analysed <strong>more than 1,600 annotated execution traces across seven multi-agent frameworks</strong>, producing fourteen failure modes in three categories. Inter-annotator agreement was 0.88, which is high.</p>
+
+  <div class="scroll">
+    <table>
+      <caption>Failures by category, and the mode people design against</caption>
+      <thead><tr><th>Category</th><th>Share</th><th>What it means</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Specification and system design</td><td class="n">41.8%</td><td><strong>The largest by a wide margin.</strong> The task was described wrongly, or the system around it was built wrongly. Includes step repetition, missing termination conditions, and disobeying the task.</td></tr>
+        <tr><td class="k">Inter-agent misalignment</td><td class="n">36.9%</td><td>Agents losing information between handoffs — reasoning that doesn't match the action taken, derailment, failure to ask for clarification.</td></tr>
+        <tr><td class="k">Task verification</td><td class="n">21.3%</td><td>Incorrect verification, incomplete verification, stopping early.</td></tr>
+        <tr><td class="k">"Disobey role specification"</td><td class="n">0.5%</td><td class="k">The rarest mode in the entire taxonomy — and the one a role-based agent team is built to prevent.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The authors also tested interventions. Adding high-level task verification improved success by <strong>+15.6%</strong>; adjusting roles and workflow gained <strong>+9.4%</strong>.</p>
+
+  <h3>The persona evidence</h3>
+
+  <p>A systematic study across four model families, <strong>162 roles</strong> and <strong>2,410 factual questions</strong> found that adding personas to system prompts produced <strong>no improvement, and often a small negative effect</strong>, against a control with no persona. A 2026 follow-up refined rather than overturned this: role prompting systematically increases apparent expertise depth while <em>reducing</em> clarity.</p>
+
+  <h3>What the vendor's own research says</h3>
+
+  <ul>
+    <li>Multi-agent architectures excel at <strong>breadth-first problems that split into independent parallel strands</strong>, and are <em>less</em> effective for tightly interdependent tasks — <strong>coding is named specifically</strong>.</li>
+    <li>Multi-agent systems consume roughly <strong>15× the tokens</strong> of standard interactions.</li>
+    <li>Token usage alone explains about <strong>80% of performance variance</strong> — more than prompt engineering or architecture.</li>
+  </ul>
+
+  <div class="verdict">
+    <h3>Reading these together</h3>
+    <p>Giving agents job titles optimises a failure mode representing <strong>0.5% of observed failures</strong>, at roughly <strong>15× the token cost</strong>, on a task type the model vendor's own research says multi-agent handles poorly — while the categories that actually dominate go unaddressed.</p>
+    <p>What is real is the <strong>boundary, not the badge</strong>: separate context, restricted tools, independence from the work being reviewed, and cost tier. Every agent should be justified by one of those four. If you cannot name which, you are writing a costume.</p>
+  </div>
+
+  <div class="note good">
+    <span class="lbl">Where bounded loops come in</span>
+    <p>The most-repeated cautionary story in this field — an agent pair that looped for eleven days and produced a $47,000 bill — has <strong>no traceable primary source.</strong> Treat it as an illustration and never as evidence.</p>
+    <p>The measured version makes the point better: formal resource limits on agent loops produced a <strong>90% reduction in token consumption and 525× lower run-to-run variance.</strong> Variance is the real finding — an unbounded loop is not merely expensive, it is unbudgetable.</p>
+  </div>
+</section>
+
+<!-- ==================== 06 ==================== -->
+<section id="cost">
+  <div class="sh">
+    <span class="eyebrow">The programme killer</span>
+    <h2>What kills these programmes</h2>
+    <p>The most instructive failure in the public record is not a team that used agents badly. It is a team that used them well and lost the budget argument anyway.</p>
+  </div>
+
+  <p>Microsoft introduced Claude Code to engineers in December 2025. Adoption reached <strong>84–95%</strong> of the cohort by April. Its own researchers measured a <strong>24% increase in merged pull requests</strong> that did not decay over four months. In June 2026 it was cancelled for roughly <strong>5,000 engineers</strong> in one division, who were moved to a cheaper tool.</p>
+
+  <p>The mechanism is easy to repeat. The pilot ran on <strong>flat seat licensing</strong>, which made consumption invisible during exactly the months when usage habits were forming. When billing moved to consumption, the real figure — <strong>$500 to $2,000 per engineer per month</strong> — arrived all at once, against a budget set when nobody knew what the number would be.</p>
+
+  <div class="scroll">
+    <table>
+      <caption>Spend, for calibration</caption>
+      <thead><tr><th>Measure</th><th>Figure</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Typical per developer</td><td class="n">$150–250 / month</td><td>Across observed enterprise deployments</td></tr>
+        <tr><td class="k">Typical per active day</td><td class="n">~$13</td><td>Under $30 a day for 90% of users</td></tr>
+        <tr><td class="k">Heavy usage, unmanaged</td><td class="n">$500–2,000 / month</td><td>The figure that ended the programme</td></tr>
+        <tr><td class="k">Prompt caching saving</td><td class="n">41–80%</td><td>Measured on agentic workloads; up to 90% on input tokens</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>They had the money. They lost the argument.</h3>
+    <p>Four controls follow directly, and all four are free if done at the start.</p>
+    <p><strong>Usage-based billing from day one</strong> — never pilot on a flat rate and convert later; you want the cost signal present while habits form. <strong>Per-user caps, not per-team</strong> — team caps punish your highest-value users by averaging them with light ones. <strong>Spend visible to the engineer generating it</strong> — the cheapest cost control is a developer who can see their own number. And <strong>track cost per merged change, not per seat</strong>, because that is the question a finance director actually asks and the one Microsoft could not answer in its own defence.</p>
+  </div>
+</section>
+
+<!-- ==================== 07 ==================== -->
+<section id="provenance">
+  <div class="sh">
+    <span class="eyebrow">Honesty</span>
+    <h2>What is verified, and what isn't</h2>
+    <p>Every figure above was checked against its primary source. Some held up exactly, some didn't, and one turned out to be folklore. If a claim gets challenged you need to know instantly whether you are standing on rock.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Checked against the primary source</caption>
+      <thead><tr><th>Claim</th><th>Status</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td class="k">METR: 19% slower, 20% perceived faster</td><td><span class="tag t-yes">Verified</span></td><td>Exact. Quote 19 and 20 and you are precisely right.</td></tr>
+        <tr><td class="k">~24% more merged pull requests</td><td><span class="tag t-yes">Verified</span></td><td><strong>Microsoft alone</strong>, tens of thousands of engineers, four months. Do not describe it as a multi-company study.</td></tr>
+        <tr><td class="k">623M changes · duplication +81% · copy-paste +41% · refactoring −70% · reuse −35%</td><td><span class="tag t-yes">Verified</span></td><td>All exact against the published report.</td></tr>
+        <tr><td class="k">Failure taxonomy: 41.8 / 36.9 / 21.3%, role disobedience 0.5%</td><td><span class="tag t-yes">Verified</span></td><td>1,600+ traces, 7 frameworks. The category totals are the figures to quote.</td></tr>
+        <tr><td class="k">98% more PRs, 91% longer reviews, flat delivery</td><td><span class="tag t-yes">Verified</span></td><td>10,000+ developers. The clearest single statement of the review bottleneck.</td></tr>
+        <tr><td class="k">5.3× pickup time · feature-branch +59% while main fell</td><td><span class="tag t-yes">Verified</span></td><td>Exact, plus main-branch success at 70.8%.</td></tr>
+        <tr><td class="k">Persona prompting: 162 roles, 2,410 questions, no improvement</td><td><span class="tag t-yes">Verified</span></td><td>Peer-reviewed. Exact.</td></tr>
+        <tr><td class="k">Bounded loops: 90% fewer tokens, 525× lower variance</td><td><span class="tag t-yes">Verified</span></td><td><strong>This is the citation to use for agent bounds.</strong> It replaces the anecdote with a measurement.</td></tr>
+        <tr><td class="k">Cancellation: 5,000 engineers, $500–2,000/month</td><td><span class="tag t-yes">Verified</span></td><td>One division, adoption 84–95%. Say "a division", not "Microsoft".</td></tr>
+        <tr><td class="k">~25% of AI samples vulnerable; SSRF most common</td><td><span class="tag t-open">Weaker source</span></td><td>534 samples, not peer-reviewed. The 45% figure comes from a different study on a looser measure. Lead with 25%.</td></tr>
+        <tr><td class="k">Cross-project work ~20% of commits · an 18-month migration compressed to 6 weeks</td><td><span class="tag t-open">Vendor-published</span></td><td><strong>From a company that sells monorepo tooling.</strong> Real, but discount it — and lead with the mechanism instead: an agent cannot read a repository it was not given.</td></tr>
+        <tr><td class="k">42% of microservices adopters consolidating back</td><td><span class="tag t-open">Secondary</span></td><td>Attributed to a 2025 survey via a blog. Get the primary before it goes in a deck.</td></tr>
+        <tr><td class="k">Delegation gap: ~60% touched, 0–20% delegable</td><td><span class="tag t-open">Unconfirmed</span></td><td>Directionally consistent with published work; the exact figures could not be confirmed. Note it measures delegation <em>without a harness</em> — and a pipeline is precisely that harness.</td></tr>
+        <tr><td class="k">70% faster incident resolution with automated rollback</td><td><span class="tag t-open">Unconfirmed</span></td><td>Widely cited, primary source not located. <strong>Lead with the mechanism</strong> — seconds versus a paged engineer. The argument does not need the number.</td></tr>
+        <tr><td class="k">$47,000 eleven-day runaway agent loop</td><td><span class="tag t-no">Folklore</span></td><td>No primary source anywhere. Use it to illustrate, never to prove.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict">
+    <h3>How to use this table</h3>
+    <p><strong>Everything marked verified was checked and is exact. Lead with those — they carry the whole argument on their own.</strong></p>
+    <p>The rest are directionally sound but should not be quoted to the decimal in a room where someone might check. A claim you can defend beats a bigger claim you cannot, and <strong>none of the recommendations change if you drop every unverified row.</strong></p>
+  </div>
+</section>
+
+<!-- ==================== 08 ==================== -->
+<section id="sources">
+  <div class="sh">
+    <span class="eyebrow">References</span>
+    <h2>Sources</h2>
+  </div>
+
+  <ul class="srcs">
+    <li><b>METR</b> — <a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/">Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity</a> · <a href="https://arxiv.org/abs/2507.09089">arXiv:2507.09089</a></li>
+    <li><b>Microsoft field study</b> — <a href="https://arxiv.org/abs/2607.01418">Adoption and Impact of Command-Line AI Coding Agents</a>, arXiv:2607.01418</li>
+    <li><b>DORA 2025</b> — <a href="https://dora.dev/dora-report-2025/">State of AI-assisted Software Development</a> · <a href="https://dora.dev/ai/capabilities-model/report/">AI Capabilities Model</a></li>
+    <li><b>GitClear</b> — <a href="https://www.gitclear.com/the_ai_code_quality_maintainability_gap">The Maintainability Gap: 2026 AI Code Quality Research</a></li>
+    <li><b>Multi-agent failure taxonomy</b> — <a href="https://arxiv.org/abs/2503.13657">Why Do Multi-Agent LLM Systems Fail?</a></li>
+    <li><b>Persona prompting</b> — <a href="https://aclanthology.org/2024.findings-emnlp.888/">When "A Helpful Assistant" Is Not Really Helpful</a> · <a href="https://arxiv.org/html/2605.29420v1">2026 follow-up</a></li>
+    <li><b>The review bottleneck</b> — <a href="https://arxiv.org/pdf/2605.01160">The Productivity-Reliability Paradox</a> · <a href="https://blog.codacy.com/ai-breaking-code-review-how-engineering-teams-survive-pr-bottleneck">LinearB and CircleCI benchmarks</a></li>
+    <li><b>Bounded agent loops</b> — <a href="https://arxiv.org/pdf/2601.08815">Agent Contracts: resource-bounded autonomous AI systems</a></li>
+    <li><b>Security</b> — AppSec Santa 2026, 534 samples across six models · <a href="https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-generated-code-vulnerability-surge-2026/">Cloud Security Alliance research note</a>, reporting the 45% figure</li>
+    <li><b>Cost and cancellation</b> — <a href="https://www.windowscentral.com/microsoft/microsoft-cancels-claude-code-licenses-shifting-developers-to-github-copilot-cli-a-move-likely-driven-by-financial-motives">Windows Central</a> · <a href="https://thenextweb.com/news/microsoft-claude-code-retreat-ai-cost">The Next Web analysis</a></li>
+    <li><b>Repository topology</b> — <a href="https://nx.dev/blog/the-effect-of-monorepos-on-the-effectiveness-of-ai-agents">The Monorepo Advantage for AI Agents</a> <em>(vendor-published — discount accordingly)</em> · <a href="https://byteiota.com/modular-monolith-42-ditch-microservices-in-2026/">CNCF consolidation survey</a></li>
+    <li><b>Agentic coding practice</b> — <a href="https://resources.anthropic.com/2026-agentic-coding-trends-report">2026 Agentic Coding Trends Report</a> · <a href="https://code.claude.com/docs/en/best-practices">Best practices for Claude Code</a></li>
+  </ul>
+
+  <div class="note">
+    <span class="lbl">One caveat on the whole set</span>
+    <p>This field moves fast enough that the METR result is already labelled historical by the people who produced it, and the tooling generation it tested is two generations old. <strong>Treat the direction as durable and the magnitudes as dated.</strong> The structural findings — where the constraint sits, what happens to duplication, where agent failures originate — have held across every study since.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Document 01 of 03 · The Plan (02) sets out what we do about all this · Implementation (03) is the build order and the standards · Every figure here is quoted with its provenance so a challenged claim can be settled rather than argued</p>
+</footer>
+
+</div>
+</body>
+</html>
