@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>The Plan</title>
-<meta name="color-scheme" content="light dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
 <style>
   :root{
     --ground:#F1F0ED; --surface:#FFFFFF; --sunk:#E7E5E1;
@@ -274,6 +274,7 @@
 </style>
 </head>
 <body>
+
 <div class="wrap">
 
 <nav class="family" aria-label="Document set">
@@ -287,7 +288,7 @@
   <h1>The Plan</h1>
   <p class="sf">What we are building, what it costs, and answers to the seven questions that came back from the first draft. The evidence sits in document 01; the build order sits in document 03.</p>
   <div class="meta">
-    <span>~40 minutes</span>
+    <span>~45 minutes</span>
     <span>Revised against feedback</span>
     <span>Supersedes the Decisions and Plan tabs of the original</span>
   </div>
@@ -304,8 +305,9 @@
   <a href="#team"><span class="cn">08</span>What a team is for</a>
   <a href="#operating"><span class="cn">09</span>How the organisation runs</a>
   <a href="#shape"><span class="cn">10</span>The pipeline, in short</a>
-  <a href="#cost"><span class="cn">11</span>What it costs</a>
-  <a href="#open"><span class="cn">12</span>What is still open</a>
+  <a href="#nonui"><span class="cn">11</span>Batch, events and scheduled work</a>
+  <a href="#cost"><span class="cn">12</span>What it costs</a>
+  <a href="#open"><span class="cn">13</span>What is still open</a>
 </nav>
 
 <!-- ==================== 01 ==================== -->
@@ -819,7 +821,57 @@
       <p>Put the tracker where the pipeline can read and write it without glue &mdash; the repository host, since the repositories exist there regardless. If the wider business runs portfolio reporting elsewhere, <strong>mirror one way only</strong>, from that system into this one, so there is still a single writer per fact. Two systems both editing the same field is the reconciliation problem this design avoids everywhere else.</p>
     </div>
   </div>
-</section>
+
+    <h3>The gap in the model, and the three things that close it</h3>
+
+    <p>The chain runs: approved scenarios are the authority &rarr; those scenarios executed are the proof &rarr; the code satisfies them. It is tempting to finish that with <em>&ldquo;so the tests are the source of truth for current behaviour&rdquo;</em>, and that is one word wrong in a way that matters.</p>
+
+    <div class="short">
+      <span class="lbl">The correction</span>
+      <p><strong>The tests are the source of truth for <em>specified</em> behaviour.</strong> The code&rsquo;s actual behaviour is whatever the code does. Tests pin only what they assert.</p>
+      <p>The delta between the two is <strong>unauthorised surface</strong> &mdash; behaviour that exists, works, and nobody asked for. It is the one structural weakness in this design, and it will not close by itself.</p>
+    </div>
+
+    <p>An agent producing extra behaviour is not a bug it can be told out of. It is a natural consequence of asking something capable to satisfy a specification: satisfying it plus a bit more still satisfies it. So the controls have to make the extra <em>visible</em> rather than try to prevent it.</p>
+
+    <div class="scroll">
+      <table>
+        <caption>Three controls, at three different moments</caption>
+        <thead><tr><th>When</th><th>Control</th><th>What it catches</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Before code<br><span style="font-weight:400;color:var(--ink-faint)">scope containment</span></td>
+            <td>The design stage produces a plan naming which files change for which requirement. The harness bounds implementation to those paths.</td>
+            <td>Whole additions that were never planned. <strong>Cheapest of the three</strong>, because nothing gets written.</td>
+          </tr>
+          <tr>
+            <td class="k">In CI<br><span style="font-weight:400;color:var(--ink-faint)">mutation score on the diff</span></td>
+            <td>Change a line of the new code and re-run the tests. If they still pass, that line&rsquo;s behaviour is unasserted.</td>
+            <td class="k"><strong>This is the direct answer to &ldquo;are the tests a tight net or a loose one&rdquo;.</strong> Coverage says a line ran; mutation says its behaviour is pinned. Only the second is worth anything here.</td>
+          </tr>
+          <tr>
+            <td class="k">At review<br><span style="font-weight:400;color:var(--ink-faint)">the scope pass</span></td>
+            <td>An agent is given the spec and the diff and asked one question: <em>what does this change do that the spec does not ask for?</em></td>
+            <td>Coherent, working, unauthorised behaviour &mdash; the class a human reviewer reliably misses.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">Why the scope pass is a machine&rsquo;s job and not a human&rsquo;s</span>
+      <p>A comprehension review asks <em>can you explain this change?</em> Unauthorised behaviour <strong>passes that test easily</strong> &mdash; it is explainable, it is coherent, and it usually looks like thoughtfulness. A human reading a diff naturally asks <em>is this correct</em>, not <em>was this asked for</em>, and glosses the second question without noticing.</p>
+      <p>An agent handed the specification and the diff does the reverse comparison mechanically, and enumerates. <strong>This is one of the few places a machine is straightforwardly better at review than a person</strong>, and the reason it is a named pass rather than a line in a checklist.</p>
+    </div>
+
+    <div class="note good">
+      <span class="lbl">And the finding is a decision, not an automatic rejection</span>
+      <p>Sometimes the extra behaviour is <em>right</em> &mdash; the agent hit something the specification missed, and the honest response is to add the requirement rather than delete the code. That is a good outcome.</p>
+      <p><strong>The goal is not zero unauthorised behaviour. It is zero unauthorised behaviour that nobody decided about.</strong> Every finding gets one of two answers: remove it, or approve it into the spec retroactively. What must never happen is the third thing &mdash; it merges unremarked and the code quietly becomes the authority.</p>
+    </div>
+
+    <p>One consequence worth stating: <strong>every change traces to a requirement, or it fails the stage.</strong> The plan maps requirements to changes; the scope pass runs that mapping backwards. A change with no requirement behind it is either unauthorised work or an unwritten requirement, and both need someone to say which.</p>
+  </section>
 
 <!-- ==================== 05 ==================== -->
 <section id="granularity">
@@ -1389,6 +1441,101 @@
   </div>
 </section>
 
+  <section id="nonui">
+    <div class="sh">
+      <span class="eyebrow">Work with no user</span>
+      <h2>Batch jobs, events and scheduled work</h2>
+      <p>Everything so far assumed someone is looking at a screen. A large share of this product will be a file arriving, an event firing, or a job running at 3am &mdash; and that half is usually the higher-risk half.</p>
+    </div>
+
+    <h3>The absence of a user raises the risk, it does not lower it</h3>
+
+    <div class="verdict">
+      <h3>A UI defect is found by the next person who looks. An ingestion defect is found in a fortnight, by an auditor.</h3>
+      <p>Nobody is watching when unattended work goes wrong, so the feedback loop that catches interactive defects for free does not exist. <strong>Unattended paths get a higher lane than their file paths suggest, not a lower one</strong> &mdash; and the instinct when writing lane rules is to think about user-facing surfaces, which is exactly backwards here.</p>
+    </div>
+
+    <p>So the lane rules enumerate by <strong>what the code touches, never by who sees it</strong>:</p>
+
+    <ul>
+      <li><strong>Reads or writes member data</strong> &rarr; Lane 3 or above, screen or no screen.</li>
+      <li><strong>Has an effect outside our system</strong> &mdash; sends, files, third-party writes &rarr; Lane 3 or above. Effects cannot be un-sent.</li>
+      <li><strong>Runs unattended</strong> &rarr; one lane higher than the same logic behind a screen would get.</li>
+      <li><strong>Silently drops or transforms records</strong> &rarr; Lane 4. This is the failure that hides longest and costs most.</li>
+    </ul>
+
+    <h3>What &ldquo;deploy dark&rdquo; means when there is no session</h3>
+
+    <p>The session-scoped flag exists to stop the screen changing under someone mid-task. With no user that concern disappears &mdash; but an analogous one replaces it: <strong>behaviour must not change halfway through a run.</strong> A job processing ten thousand records should not switch parsers at record five thousand because someone flipped a flag.</p>
+
+    <p>So the rule generalises rather than needing an exception. <strong>Evaluate the flag at the boundary of the unit of work, and hold it for that unit.</strong></p>
+
+    <div class="scroll">
+      <table>
+        <caption>Same rule, four different units</caption>
+        <thead><tr><th>Kind of work</th><th>Unit of consistency</th><th>Flag read</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Interactive</td><td>The session</td><td>At sign-in</td></tr>
+          <tr><td class="k">Batch</td><td>The run</td><td>At job start</td></tr>
+          <tr><td class="k">Event-driven</td><td>The message</td><td>On receipt</td></tr>
+          <tr><td class="k">Scheduled</td><td>The execution</td><td>At trigger</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>But for this work, shadow running beats a flag</h3>
+
+    <div class="short">
+      <span class="lbl">The better mechanism</span>
+      <p><strong>Run the new path alongside the old one, on the same input, and compare the outputs.</strong> The old path stays authoritative. Nothing downstream changes until you switch which one counts.</p>
+    </div>
+
+    <p>This is available for unattended work and not for interactive work, and it is strictly stronger than a flag, because <strong>you get evidence before you switch rather than confidence.</strong></p>
+
+    <ol>
+      <li>New parser deployed, runs on every file the old one runs on.</li>
+      <li>Both write results. <strong>The old one is authoritative; the new one writes somewhere nothing reads.</strong></li>
+      <li>Outputs are compared automatically. Where they differ, that difference is a finding &mdash; sometimes a bug in the new path, sometimes a bug in the old one nobody knew about.</li>
+      <li>When the disagreement rate is understood rather than merely low, flip which one is authoritative.</li>
+      <li>Remove the old path. Same cleanup discipline as any flag.</li>
+    </ol>
+
+    <div class="note">
+      <span class="lbl">What &ldquo;dark&rdquo; actually gates here</span>
+      <p><strong>Flag the side effect, not the computation.</strong> A new ingestion path can parse, compute and store all day without anyone noticing, because none of that is visible. What must stay off is the part that reaches the world &mdash; the notification, the outbound file, the record other systems read.</p>
+      <p>That is a much narrower thing to wrap than the whole path, and it keeps the flag count down for exactly the reason interactive flags stay low: gate the point of exposure, not the machinery behind it.</p>
+    </div>
+
+    <h3>Where the acceptance scenario lives</h3>
+
+    <p>Unchanged, and this is the part that surprises people. <strong>The scenario format is a behaviour language, not a browser language.</strong> Nothing about it assumes a screen:</p>
+
+    <span class="fname">features/discharge-ingestion.feature</span>
+    <pre><code>Feature: Discharge file ingestion
+
+  @ACME-518-R3
+  Scenario: A malformed file is quarantined rather than dropped
+    Given a discharge file whose header cannot be parsed
+    When  the ingestion job processes it
+    Then  the file is moved to quarantine
+    And   an ingestion.failed event is emitted
+    And   no member records are created from it</code></pre>
+
+    <p>It lives in <code>features/</code> beside every other capability, organised the same way, tagged the same way, approved by the same person. <strong>What changes is only the step definitions</strong> &mdash; they drop a file and invoke the job rather than driving a browser.</p>
+
+    <div class="note good">
+      <span class="lbl">Why that matters more than it sounds</span>
+      <p>The whole argument for specifications not drifting rests on <em>the thing product approved is the thing that gates production</em>. If unattended work needed a different specification format, that chain would break for the half of the system where the consequences are worst.</p>
+      <p>It does not. <strong>One format, one place, one approval route, two harnesses.</strong> The person approving the quarantine behaviour reads exactly what they would read for a screen.</p>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The one thing genuinely harder here</span>
+      <p><strong>Nobody notices a scheduled job that stopped running.</strong> A screen that fails to load generates a complaint within minutes; a nightly recompute that silently exits early generates nothing at all.</p>
+      <p>So unattended work carries one obligation interactive work does not: <strong>it must emit a signal on success, not only on failure</strong>, and something must alert on the absence of that signal. A job that reports nothing when healthy and nothing when dead is indistinguishable from a job that is fine.</p>
+    </div>
+  </section>
+
 <!-- ==================== 10 ==================== -->
 <section id="cost">
   <div class="sh">
@@ -1485,5 +1632,7 @@
 </footer>
 
 </div>
+
+
 </body>
 </html>
