@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
 <title>The Plan</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -274,7 +276,6 @@
 </style>
 </head>
 <body>
-
 <div class="wrap">
 
 <nav class="family" aria-label="Document set">
@@ -288,7 +289,7 @@
   <h1>The Plan</h1>
   <p class="sf">What we are building, what it costs, and answers to the seven questions that came back from the first draft. The evidence sits in document 01; the build order sits in document 03.</p>
   <div class="meta">
-    <span>~45 minutes</span>
+    <span>~53 minutes</span>
     <span>Revised against feedback</span>
     <span>Supersedes the Decisions and Plan tabs of the original</span>
   </div>
@@ -358,7 +359,7 @@
     <span class="lbl">The number worth getting</span>
     <p>How many repositories hold <em>application</em> code, and how many of those are candidates to keep after the salvage review. That is the figure that matters, and it is almost certainly single digits. Forty-eight is a scary number that mostly describes Terraform.</p>
   </div>
-</section>
+      </section>
 
 <!-- ==================== 02 ==================== -->
 <section id="releases">
@@ -595,6 +596,14 @@
     </ul>
     <p>Cheap now, and genuinely painful to introduce against two hundred existing flags.</p>
   </div>
+  <h3>A rollback must not be able to close a reportable event</h3>
+
+    <p>Reverting the code does not un-expose data that was already exposed, and breach notification does not care that the window was four minutes. So one rule here is procedural rather than technical: <strong>any change that newly exposes member data opens a disposition record, and only a person can close it.</strong> An automatic rollback may resolve the outage. It may not resolve the disclosure, and it must not be able to quietly file one away.</p>
+
+    <div class="note warn">
+      <span class="lbl">The one place the reversibility argument stops</span>
+      <p>Everywhere else in this design, a good undo is what buys the right to move quickly &mdash; that is the whole governing rule. For exposure of protected health information there is no undo at all, only containment and a legal clock. That is the actual reason the top lane needs a named human <em>before</em> release rather than a fast responder after it, and it is worth saying plainly, because a pipeline built on reversibility will otherwise treat this case like every other one.</p>
+    </div>
 </section>
 
 <!-- ==================== 03 ==================== -->
@@ -997,6 +1006,20 @@
       <p>That is what the risk lanes are for. A copy change gets automated checks and ships. A change touching member data gets a written spec, two reviewers and a named approver. <strong>Same pipeline, four different depths</strong> — and the depth is set by which files were touched, not by anyone's estimate.</p>
     </div>
   </div>
+  <h3>What confirms that several changes fully and only deliver one approved spec?</h3>
+
+    <p>Each change under the cap is individually reviewable, which is the entire point of the cap. What that leaves open is the <em>set</em>. Five changes can each be correct while the feature is still incomplete, and &mdash; harder to catch &mdash; scope can creep across the set while every individual diff looks perfectly reasonable. Nobody reviewing one change is positioned to notice either failure.</p>
+
+    <p>The answer is a <strong>ledger, not another review</strong>, and it runs in both directions:</p>
+
+    <ul>
+      <li><strong>Nothing missing.</strong> Every requirement ID in the approved spec is claimed by at least one passing tagged scenario. This is mechanical &mdash; CI computes it, and the feature cannot close until it reconciles.</li>
+      <li><strong>Nothing crept in.</strong> The <em>union</em> of the diffs is read once, as a whole, against the spec. This half cannot be automated, and it is the half that matters, because cross-change scope creep is invisible at the level where reviews actually happen.</li>
+    </ul>
+
+    <p>This is the same artefact as the orchestrating step named elsewhere as missing &mdash; the thing that owns a feature across several merges and closes it. One thing to build rather than two, which is the useful part of noticing they are the same.</p>
+
+    <p>One consequence that is otherwise discovered late: if a spec freezes at merge but the feature spans five merges, <strong>it freezes on the last one</strong>. The issue stays live, and the ledger stays open, until the set closes.</p>
 </section>
 
 <!-- ==================== 07 ==================== -->
@@ -1070,6 +1093,20 @@
       <p><strong>That is a decision record, and it is written before any feature depends on it.</strong> Section 08 is about who does that work — it is the part of analysis that survives, and it is the more interesting half.</p>
     </div>
   </div>
+  <h3>Where infrastructure code lives, when one change spans an application and a queue</h3>
+
+    <p>Infrastructure code living with the thing it provisions is the right rule, and it leaves one case open: an agent adds an endpoint that needs a new queue and a new secret. That is a single logical change spanning a repository with full context and one with none.</p>
+
+    <p>Treating it as in-or-out is the mistake. <strong>Split by lifecycle</strong>, because two different things have been sharing one word:</p>
+
+    <ul>
+      <li><strong>Estate infrastructure</strong> &mdash; networks, the container environment, shared data stores, identity and access foundations. Changes rarely, blast radius is everything, humans drive it. Agents correctly have neither context nor reach here.</li>
+      <li><strong>Service-owned resources</strong> &mdash; the queue this service reads, the secrets it needs, its own revision configuration, its own storage. Changes at exactly the rate of the code it serves, blast radius is one service. Lives with that service, <em>holding its own state</em>.</li>
+    </ul>
+
+    <p>The objection to that split is that it fragments infrastructure state. That is the answer rather than the cost. Per-service state bounds what a single apply can damage, lets one service fail without touching another, and is the only arrangement under which scoped agent work is safe at all &mdash; estate-wide shared state is the thing genuinely worth avoiding. References run one direction only, services reading published platform outputs and the platform never reading service state, which keeps the dependency acyclic.</p>
+
+    <p>The common case then stops being a two-repository handoff and becomes one change in one place. It degrades to a handoff only when the change genuinely reaches the estate, which is exactly when a second person in a second repository is what you want rather than what you tolerate. The guardrail is that approved plan paths include a service&rsquo;s own infrastructure directory and never the platform&rsquo;s, with a policy check on the plan so that a service-scoped change attempting to create something estate-level fails in CI rather than at apply time.</p>
 </section>
 
 <!-- ==================== 08 ==================== -->
@@ -1357,11 +1394,26 @@
     </table>
   </div>
 
+    <h3>Where member data flows, mapped before anything is routed</h3>
+
+    <p>One artefact has to exist before any of the risk machinery means much: <strong>a map of where protected health information enters, rests, moves and leaves</strong>. Not a risk category alongside others &mdash; the spine the rest of this hangs from. Lanes are computed against it, the security and privacy requirement class is written against it, and a change touching nothing on it is cheap to ship in a way no rule of thumb can establish.</p>
+
+    <p>It is also the only version of this that survives a real codebase. <em>Is this change sensitive?</em> is unanswerable in the abstract and close to trivial against a map.</p>
+
     <h3>The four risk lanes, since everything above refers to them</h3>
 
-    <p>A lane is assigned <strong>automatically from the files a change touches</strong>, never from what the author claims about it. That is the whole mechanism &mdash; self-declared risk is always low.</p>
+    <p>A lane is assigned <strong>automatically from the dependency graph</strong> &mdash; what the change touches <em>and everything that depends on it</em> &mdash; never from what the author claims about it. That is the whole mechanism: self-declared risk is always low.</p>
+
+    <p>Deriving the lane from the graph rather than from a list of file-path rules closes two failures that are silent by construction. New code nobody has written a rule for yet falls through to the default lane, and a change to a shared helper reads as harmless even when the thing importing it is billing or eligibility. Both mis-route a sensitive change <em>downward</em>, and the reason neither gets noticed is that <strong>&ldquo;no rule matched&rdquo; and &ldquo;matched the safe rule&rdquo; produce an identical result</strong>. The graph has neither problem: new code is in it the moment it exists, and indirect reach appears without anyone remembering to declare it.</p>
+
+    <div class="note">
+      <span class="lbl">Two conditions, or the graph is worse than the list it replaced</span>
+      <p><strong>It fails closed.</strong> A change the graph cannot classify routes to the <em>top</em> lane, not the bottom. A miss then sends work up a lane and never down, which is the only defensible default anywhere the cost of being wrong is a member&rsquo;s data.</p>
+      <p><strong>It needs a floor it cannot see past.</strong> A dependency graph is static reach only. It will not show two services coupled through a queue, an event, a configuration value, a runtime lookup or a shared table. So a short hand-kept list of always-top-lane surfaces &mdash; PHI touchpoints, authentication, billing &mdash; sits underneath it. The graph may promote a change; the list may never demote one. That is the one job path rules still do honestly, and it is worth keeping them for it.</p>
+      <p>The cost is real and worth stating: this works only if the graph is clean, which is a large part of the argument for a monorepo with enforced module boundaries. A messy graph gives messy routing, and routing nobody trusts gets overridden.</p>
+    </div>
     <figure class="dg">
-      <svg viewBox="0 0 780 296" role="img" aria-label="Four horizontal bars of increasing length, one per risk lane. Lane 1 passes automated checks only and ships. Lane 2 adds machine review and one human reviewer. Lane 3 adds a second reviewer and a security review. Lane 4 adds a named human approval before release.">
+      <svg viewBox="0 0 780 314" role="img" aria-label="Four horizontal bars of increasing length, one per risk lane. Every lane ends at a human reviewer. Lane 1 gets automated checks, machine review and a review measured in seconds. Lane 2 is the same three with a full reviewer. Lane 3 adds a second reviewer and a security review. Lane 4 adds a named human approval before release.">
         <defs>
           <marker id="dg2-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
@@ -1378,9 +1430,11 @@
 
         <!-- lane 1 -->
         <text x="172" y="86" text-anchor="end" class="dg-tb">Lane 1 &middot; Cosmetic</text>
-        <rect x="190" y="70" width="56" height="22" rx="2" class="dg-accbox"/>
+        <rect x="190" y="70" width="286" height="22" rx="2" class="dg-accbox"/>
         <circle cx="215" cy="81" r="6" class="dg-accf"/>
-        <text x="268" y="86" class="dg-ta">ships on green</text>
+        <circle cx="330" cy="81" r="6" class="dg-accf"/>
+        <circle cx="445" cy="81" r="5.5" class="dg-acc"/>
+        <text x="498" y="86" class="dg-ta">review in seconds</text>
 
         <!-- lane 2 -->
         <text x="172" y="140" text-anchor="end" class="dg-tb">Lane 2 &middot; Standard</text>
@@ -1407,9 +1461,10 @@
         <circle cx="675" cy="243" r="6" class="dg-accf"/>
 
         <!-- routing note -->
-        <text x="190" y="284" class="dg-tf">Assigned from the files a change touches &mdash; never from what the author claims.</text>
+        <text x="190" y="284" class="dg-tf">Assigned from the dependency graph &mdash; what a change touches, and everything that depends on it.</text>
+        <text x="190" y="302" class="dg-tf">Anything it cannot classify routes to the top lane, never the bottom.</text>
       </svg>
-      <figcaption><b>A lane is not a label on a change. It is how much of the pipeline that change has to traverse.</b> The same eleven stages run for everything; the lane decides how many controls sit on top &mdash; which is what lets scarce review capacity land where consequences are real instead of being spread evenly across copy fixes and clinical logic.</figcaption>
+      <figcaption><b>A lane is not a label on a change. It is how much of the pipeline that change has to traverse.</b> The same eleven stages run for everything; the lane decides how many controls sit on top &mdash; which is what lets scarce review capacity land where consequences are real instead of being spread evenly across copy fixes and clinical logic. <b>Every lane ends at a person.</b> The hollow marker on Lane 1 is a review measured in seconds, not an absent one.</figcaption>
     </figure>
 
 
@@ -1419,7 +1474,7 @@
         <caption>How much process a change gets</caption>
         <thead><tr><th>Lane</th><th>Typical change</th><th>What it gets</th></tr></thead>
         <tbody>
-          <tr><td class="k">1 &middot; Cosmetic</td><td>Copy, configuration, logging, documentation.</td><td>Automated checks only. <strong>Ships on green, no human in the path</strong> &mdash; this is the lane that pays for the whole scheme.</td></tr>
+          <tr><td class="k">1 &middot; Cosmetic</td><td>Copy, configuration, logging, documentation.</td><td>Automated checks, machine pre-review, then <strong>one person who should be able to approve in seconds</strong>. This lane still pays for the scheme &mdash; not by removing the human, but by making the review cheap enough to be free.</td></tr>
           <tr><td class="k">2 &middot; Standard</td><td>Ordinary feature work.</td><td>Automated checks, machine review, then one human reviewer.</td></tr>
           <tr><td class="k">3 &middot; Sensitive</td><td>Authentication, personal data, anything with a database migration.</td><td>All of the above plus a <strong>second reviewer</strong>, a security review, and an explicit rollback plan.</td></tr>
           <tr><td class="k">4 &middot; Clinical</td><td>Member data, clinical logic.</td><td>Everything in Lane 3 plus a <strong>named human approval before release</strong>. <em>Rollback restores the system, not the person.</em></td></tr>
@@ -1427,6 +1482,11 @@
       </table>
     </div>
 
+    <div class="note">
+      <span class="lbl">Resolved: there is no auto-merge lane</span>
+      <p>This design flagged twice that two rules stated absolutely &mdash; <em>every change is reviewed by a person</em> and <em>Lane 1 ships on green with nobody in the path</em> &mdash; cannot both hold. In a covered entity it resolves in one direction. <strong>Every change gets human review, and AI-authored code is held to exactly the review that human-authored code is.</strong> There is no bypass, and the branch protection rule set has no exception in it.</p>
+      <p>The consequence is worth writing down rather than discovering in month three. Once a person sits on the path of every change, <strong>review attention becomes the throughput limit for the entire pipeline</strong>. Everything that makes a review cheap stops being a refinement and turns load-bearing: small diffs, the scope review pass, and machine review used as a pre-filter that aims a person&rsquo;s attention rather than as a gate that passes work on its own. What varies by lane is no longer whether someone looks &mdash; it is how much they are asked to look at, and how much has already been narrowed down for them.</p>
+    </div>
     <div class="note warn">
       <span class="lbl">The rules need a team-size clause, stated now rather than discovered</span>
       <p>Four rules elsewhere in this design are individually sensible and collectively impossible at eight engineers: one owning team per module, teams review their own code, Lane 3 needs two reviewers from the owning team, and reviewers rotate within the team. Split eight people across three surfaces and an owning team is two or three &mdash; so &ldquo;two from the owning team&rdquo; means everyone reviews everything, and rotation has nothing to rotate between.</p>
@@ -1439,7 +1499,21 @@
     <span class="lbl">Where it runs</span>
     <p><strong>Two stages on a developer's machine, nine headless in CI.</strong> Specification and review are interactive because they need a conversation. Everything else runs on a trigger with nobody waiting, which is what makes it cheap and auditable.</p>
   </div>
-</section>
+  <h3>The two dials of autonomy, and why they do not climb together</h3>
+
+    <p>Two separate things govern how much runs without a person, and it is easy to treat them as one: <strong>what an agent may touch</strong>, bounded by the approved plan&rsquo;s paths, and <strong>what may run unattended</strong>, bounded by reversibility. They are different dials, and they are earned by different evidence.</p>
+
+    <p>Reach is earned by scope discipline &mdash; does work stay inside what was approved, measured from containment violations over time. Unattended execution is earned by the undo being proven &mdash; rollback exercised rather than assumed, blast radius bounded, a signal emitted on success. One is a property of the planning half of this pipeline, the other of the deployment half. A team can be genuinely good at one and poor at the other, and coupling the dials lets whichever is weaker hold the other hostage.</p>
+
+    <p>Two things follow, both cheap now and awkward to retrofit:</p>
+
+    <ul>
+      <li><strong>Reversibility is a property of a surface, not of a change.</strong> The undo on a stateless endpoint is nothing like the undo on a data migration, and neither resembles a message already delivered to a member. So that dial climbs surface by surface, with the evidence recorded against the surface.</li>
+      <li><strong>Every level needs a documented way back down.</strong> A ladder with no demotion trigger is a ratchet, and a ratchet is how an organisation ends up holding autonomy nobody feels able to revoke. Write the trigger at the same time as the promotion rule, and have the same person own both.</li>
+    </ul>
+
+    <p>The question underneath both dials is worth keeping in the language exactly as it is: <strong>how good is our undo?</strong> Every argument here about what may run unattended reduces to it, and it is a far better question than asking how much a team trusts the tool.</p>
+  </section>
 
   <section id="nonui">
     <div class="sh">
@@ -1632,7 +1706,5 @@
 </footer>
 
 </div>
-
-
 </body>
 </html>

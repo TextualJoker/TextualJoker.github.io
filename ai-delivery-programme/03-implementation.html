@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
 <title>Implementation</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -207,7 +209,6 @@
 </style>
 </head>
 <body>
-
 <div class="wrap">
 
 <nav class="family" aria-label="Document set">
@@ -221,7 +222,7 @@
   <h1>Implementation</h1>
   <p class="sf">What gets built, in what order, and the small number of things that cannot be added later. Five stages, started by events rather than dates, because a company with no pipeline has no basis for a date.</p>
   <div class="meta">
-    <span>~32 minutes</span>
+    <span>~34 minutes</span>
     <span>Five stages, 48 numbered steps</span>
     <span>Full step detail remains in the original plan</span>
   </div>
@@ -254,8 +255,8 @@
       <tbody>
         <tr>
           <td class="k">Human review required</td>
-          <td>A branch protection rule set when the repository is created, with exactly one bypass — the pipeline, on the lowest risk lane only.</td>
-          <td>The highest-return control available, for one setting. <strong>Decide the low-lane bypass now</strong> rather than discovering in month two that two rules you both stated absolutely are incompatible.</td>
+          <td>A branch protection rule set when the repository is created, with <strong>no bypass at all</strong> &mdash; the pipeline included.</td>
+          <td>The highest-return control available, for one setting. <strong>Resolved: there is no low-lane bypass.</strong> Every change is reviewed by a person, and AI-authored code is held to exactly the review human-authored code gets. The consequence worth planning for is that review attention then becomes the throughput limit for the whole pipeline.</td>
         </tr>
         <tr>
           <td class="k">Provenance on every commit</td>
@@ -269,7 +270,7 @@
         </tr>
         <tr>
           <td class="k">Risk lane definitions</td>
-          <td>Which surfaces are high risk <em>here</em>, applied automatically from the files a change touches.</td>
+          <td>Where protected health information enters, rests, moves and leaves &mdash; and lanes computed against that map from the dependency graph, failing closed to the top lane.</td>
           <td>Risk becomes self-declared, and self-declared risk is always low.</td>
         </tr>
         <tr>
@@ -503,16 +504,16 @@
         <caption>Steps 14&ndash;25 &middot; foundations and instrumentation</caption>
         <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
         <tbody>
-          <tr><td class="n">14</td><td class="k">Branch protection, review required, bypass decided</td><td>The highest-return control available, for one setting. <strong>Decide the low-lane bypass now</strong> rather than discovering in month two that two absolute rules are incompatible.</td><td class="n">An hour</td></tr>
+          <tr><td class="n">14</td><td class="k">Branch protection, review required, no bypass</td><td>The highest-return control available, for one setting. <strong>Resolved: no lane bypasses human review</strong>, and AI-authored code is held to the same standard as human-authored code. Set it with no exception in it &mdash; an exception added later is the one nobody revisits.</td><td class="n">An hour</td></tr>
           <tr><td class="n">15</td><td class="k">Provenance trailer plus the check</td><td><span class="tag t-no">Unrecoverable</span> Cannot be backfilled, and every AI-specific measurement downstream depends on it. Check the merge strategy, not just the branch commits.</td><td class="n">An hour</td></tr>
           <tr><td class="n">16</td><td class="k">The telemetry contract &mdash; three joins</td><td><span class="tag t-no">Unrecoverable</span> Deploys carry the commit, incidents carry the deploy, test results stored per run. The third one especially: a run never recorded is gone.</td><td class="n">A day</td></tr>
-          <tr><td class="n">17</td><td class="k">Scaffold the repository, strict, boundaries enforced</td><td><span class="tag t-no">Unrecoverable in practice</span> <strong>The single most valuable hour in the plan.</strong> Nobody turns warnings-as-errors on against a year of existing code, so in practice it is now or never. Build the config parity check in the same sitting.</td><td class="n">2&ndash;3 days</td></tr>
+          <tr><td class="n">17</td><td class="k">Scaffold the repository, strict, boundaries enforced</td><td><span class="tag t-no">Unrecoverable in practice</span> <strong>The single most valuable hour in the plan.</strong> Nobody turns warnings-as-errors on against a year of existing code, so in practice it is now or never. Build the config parity check in the same sitting. Boundaries include the infrastructure split: a service owns its own resources and its own state, while the estate is a separate home that no approved agent path reaches.</td><td class="n">2&ndash;3 days</td></tr>
           <tr><td class="n">18</td><td class="k">Shared CI workflow, called not copied</td><td>Must exist <em>before</em> the first workflow gets pasted. After that it is archaeology across N repositories. Pin callers to a tag, never a branch.</td><td class="n">Half a day</td></tr>
-          <tr><td class="n">19</td><td class="k">Risk lanes wired to path-based routing</td><td>Review capacity is the binding constraint, so spending it uniformly spends it badly. Doing this before the first feature means the pattern is established rather than retrofitted.</td><td class="n">An hour</td></tr>
-          <tr><td class="n">20</td><td class="k">The system overview &mdash; one page</td><td>The design stage reads this, so it exists before the first feature. Services, where data lives, boundaries that must not be crossed, and <strong>what is deliberately undecided</strong> so an agent proposes rather than assumes.</td><td class="n">An hour</td></tr>
+          <tr><td class="n">19</td><td class="k">Map where member data flows, then compute lanes from the dependency graph</td><td>Two artefacts in one sitting. First <strong>a map of where protected health information enters, rests, moves and leaves</strong> &mdash; the spine the rest of the risk machinery hangs from, not a category within it. Then lane routing derived from the <strong>dependency graph</strong>, meaning what a change touches and everything that depends on it, rather than from hand-written path rules. Path rules fail silently in two directions: new code matches nothing and lands in the default lane, and a shared helper reads as harmless when the thing importing it is billing. <strong>Unclassified routes to the top lane</strong>, so a miss sends work up and never down. Keep a short hand-kept list of always-top-lane surfaces underneath, because the graph is static reach only and cannot see coupling through a queue, an event or a shared table &mdash; the graph may promote a change, the list may never demote one. Per-change threat models and named review perspectives (security, PHI flow, infrastructure, clinical safety) attach to the top two lanes here. Review capacity is the binding constraint, so spending it uniformly spends it badly.</td><td class="n">A day</td></tr>
+          <tr><td class="n">20</td><td class="k">The system overview &mdash; one page</td><td>The design stage reads this, so it exists before the first feature. Services, where data lives, boundaries that must not be crossed, and <strong>what is deliberately undecided</strong> so an agent proposes rather than assumes. The system-level threat model lives with this page and is revisited on the same cadence.</td><td class="n">An hour</td></tr>
           <tr><td class="n">21</td><td class="k">Design tokens and the generation chain</td><td>Before any component &mdash; one built against a hand-written colour is one to redo. Stand it up with placeholder values if the palette is not ready; the pipeline matters more than the values on day one.</td><td class="n">A day</td></tr>
           <tr><td class="n">22</td><td class="k">The remaining shared homes, empty</td><td>The destination has to exist before the first shared thing is written, or it lands in a feature folder and is invisible forever. Each with an owner and a README saying what belongs there.</td><td class="n">Half a day</td></tr>
-          <tr><td class="n">23</td><td class="k">Environments, with production gated from day one</td><td>Almost impossible to retrofit once things are deployed. The required-reviewer rule wants setting while it costs nothing &mdash; adding a gate later reads as distrust. <br><br><strong>And set the flag lifecycle rules here, before the first flag exists.</strong> <span class="tag t-no">Unrecoverable in practice</span> Every flag carries a named owner and a removal date as required fields; CI warns at fourteen days out and fails the build on the date; permanent kill switches are marked as a different kind so the cleanup rule skips them. Introducing this against two hundred existing flags means auditing two hundred flags, which nobody will do &mdash; so it is now or never.</td><td class="n">A day</td></tr>
+          <tr><td class="n">23</td><td class="k">Environments, with production gated from day one</td><td>Almost impossible to retrofit once things are deployed. The required-reviewer rule wants setting while it costs nothing &mdash; adding a gate later reads as distrust. <br><br><strong>And set the flag lifecycle rules here, before the first flag exists.</strong> <span class="tag t-no">Unrecoverable in practice</span> Every flag carries a named owner and a removal date as required fields; CI warns at fourteen days out and fails the build on the date; permanent kill switches are marked as a different kind so the cleanup rule skips them. Introducing this against two hundred existing flags means auditing two hundred flags, which nobody will do &mdash; so it is now or never. <br><br><strong>The exception register runs on the same expiry engine.</strong> Anywhere a rule is knowingly broken gets an entry with a named owner and a hard expiry date, enforced by the identical check. One mechanism serving two purposes, rather than two half-built ones discovered to be the same thing a year later.</td><td class="n">A day</td></tr>
           <tr><td class="n">24</td><td class="k">Telemetry on, pointed anywhere</td><td>Free, and history cannot be generated retroactively. Content logging stays off.</td><td class="n">Free</td></tr>
           <tr><td class="n">25</td><td class="k">Start the synthetic dataset</td><td>Long lead time. Without a convincing one, people eventually reach for real data and no automated guard catches every route.</td><td class="n">Ongoing</td></tr>
         </tbody>
@@ -528,7 +529,7 @@
         <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
         <tbody>
           <tr><td class="n">26</td><td class="k">Pick the pilot team by throughput, not enthusiasm</td><td>A baseline of two or more changes a week predicted retention; seniority and stated enthusiasm predicted adoption but not retention. Pick a team whose success is visible to others.</td><td class="n">A conversation</td></tr>
-          <tr><td class="n">27</td><td class="k">Ship the specification commands</td><td>The grammar makes vagueness ungrammatical &mdash; you cannot write "handles errors gracefully" because the template demands a named trigger, system and response.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">27</td><td class="k">Ship the specification commands</td><td>The grammar makes vagueness ungrammatical &mdash; you cannot write "handles errors gracefully" because the template demands a named trigger, system and response. It also carries a <strong>security and privacy requirement class</strong>, so HIPAA safeguards are written as scenarios that execute rather than as prose nobody runs.</td><td class="n">Half a day</td></tr>
           <tr><td class="n">28</td><td class="k">Wire the scenarios to run as tests</td><td><strong>The load-bearing step.</strong> Without it the specification is documentation and drifts within a month. With it, the scenario product approved <em>is</em> the test gating production. Set sharding and scope rules in the same sitting. <strong>Feature files are organised by capability, never by change</strong> &mdash; a change adds a scenario to the file that already exists, or you end up with two hundred issue-named files and no way to know what covers what.</td><td class="n">Half a day</td></tr>
           <tr><td class="n">29</td><td class="k">Requirement IDs traceable end to end</td><td><strong>This is the drift detector</strong>, and it is what makes disposable specs safe. The ID travels from the spec to a tag on the scenario that proves it to the commit trailer &mdash; so "why does it behave this way" resolves back to the issue that introduced it, and a requirement with no test referencing it is a query rather than a mystery.</td><td class="n">Half a day</td></tr>
           <tr><td class="n">30</td><td class="k">Generate the reuse catalogue; make discovery blocking</td><td>Duplication rose 81% and cross-file reuse fell 35% across 623 million AI-assisted changes, because new code is always the path of least resistance. An advisory reminder does not change that; a stage that fails on an unjustified "new" does.</td><td class="n">1&ndash;2 days</td></tr>
@@ -567,12 +568,12 @@
         <tbody>
           <tr><td class="n">40</td><td class="k">Declare the bounds before writing any stage</td><td>Iteration cap, budget cap, a success function the agent evaluates itself, an escalation path, no-progress detection. <strong>The budget cap is two numbers</strong> &mdash; per stage and accumulated per run &mdash; because per-stage caps do not bound a feature.</td><td class="n">An hour</td></tr>
           <tr><td class="n">41</td><td class="k">Build the shared stage harness first</td><td>Written individually, the bounds get implemented eleven times and eleven ways, and the one that gets skipped is the one that runs away.</td><td class="n">2&ndash;3 days</td></tr>
-          <tr><td class="n">42</td><td class="k">Give the run an owner and a close <span class="tag t-info">New</span></td><td><strong>Currently missing from this design.</strong> Stages are independent jobs triggered by labels, so nothing is accountable for a piece of work end to end &mdash; it can stall between stages and nothing notices. One orchestrating step holds the run identifier, enforces the gates in order, and <strong>closes with a summary</strong>. That summary is also the traceability record.</td><td class="n">2 days</td></tr>
+          <tr><td class="n">42</td><td class="k">Give the run an owner and a close <span class="tag t-info">New</span></td><td><strong>Currently missing from this design.</strong> Stages are independent jobs triggered by labels, so nothing is accountable for a piece of work end to end &mdash; it can stall between stages and nothing notices. One orchestrating step holds the run identifier, enforces the gates in order, and <strong>closes with a summary</strong>. That summary is also the traceability record, and the <strong>completeness ledger</strong>: every requirement ID in the approved spec claimed by a passing tagged scenario, and the union of the diffs read once as a whole against that spec. Nothing approved missing, nothing unapproved added &mdash; and the second half is the one no single-change review is positioned to see. A spec spanning several merges freezes on the last of them, not the first.</td><td class="n">2 days</td></tr>
           <tr><td class="n">43</td><td class="k">Add the ambiguity path <span class="tag t-info">New</span></td><td><strong>Also missing.</strong> Triage currently classifies confidently every time. When the ask is genuinely unclear the correct behaviour is to stop and ask a person, not to guess well. Failing to ask for clarification is <strong>6.8% of observed agent failures</strong> &mdash; thirteen times more common than the role-confusion failure this plan spends a section arguing about.</td><td class="n">A day</td></tr>
           <tr><td class="n">44</td><td class="k">Bound each stage to its approved scope <span class="tag t-info">New</span></td><td>The approved plan defines which paths may be touched, and the harness enforces it rather than trusting the agent to stay inside &mdash; so scope creep fails a check instead of arriving in review.<br><br><strong>Pair it with the detection half: a scope pass at review.</strong> An agent is given the spec and the diff and asked one question &mdash; <em>what does this change do that the spec does not ask for?</em> Containment catches whole unplanned additions before code exists; the pass catches the coherent, working, unauthorised behaviour that a human reviewer reliably misses because it reads as thoughtfulness. <strong>Every finding is a decision</strong> &mdash; remove it, or approve it into the spec retroactively. Never absorbed unremarked.</td><td class="n">A day</td></tr>
           <tr><td class="n">45</td><td class="k">Add the durable-document decision point <span class="tag t-info">New</span></td><td>Durable artifacts &mdash; the system overview, the decision records &mdash; have no update trigger in this design, which is how they quietly go stale. Every run asks one question before closing: <em>did this change platform truth?</em> If yes, updating is in scope and someone decides. If no, it is explicitly out of scope and nobody touches it.</td><td class="n">Half a day</td></tr>
           <tr><td class="n">46</td><td class="k">Wire triage first, then the rest in reversibility order</td><td>Triage produces a comment, so it is fully reversible &mdash; the safest place to learn how headless agents behave. Then reuse, design, decomposition, verification, implementation, staging, and production last. Each shadowed first, promoted after a fortnight of being right.</td><td class="n">Weeks</td></tr>
-          <tr><td class="n">47</td><td class="k">Build the reversibility stack before automating deployment</td><td>Autonomous deployment is not about trusting the agent &mdash; it is about making being wrong cheap. <strong>If automated reversal cannot be achieved, deployment stays a human gate.</strong> That is a legitimate outcome; it just needs deciding rather than discovering.</td><td class="n">The real work</td></tr>
+          <tr><td class="n">47</td><td class="k">Build the reversibility stack before automating deployment</td><td>Autonomous deployment is not about trusting the agent &mdash; it is about making being wrong cheap. <strong>If automated reversal cannot be achieved, deployment stays a human gate.</strong> That is a legitimate outcome; it just needs deciding rather than discovering. On Azure Container Apps the canary and the rollback ride revisions, so the mechanism exists to be exercised rather than built. <strong>One exception belongs in the same sitting:</strong> a change newly exposing member data opens a disposition record only a person may close. Reverting code does not un-expose data, and an automatic rollback must not be able to quietly close a reportable event.</td><td class="n">The real work</td></tr>
           <tr><td class="n">48</td><td class="k">The golden set, plus register the pipeline as an identity</td><td>Once agents run delivery, <strong>a prompt change is a production change</strong> &mdash; editing the reviewer's instructions alters the quality gate on every change in the company. And a pipeline with commit and deploy rights is a service account with production access.</td><td class="n">2 days</td></tr>
         </tbody>
       </table>
@@ -611,7 +612,7 @@
         <tr>
           <td class="k">Review is real<br><span style="font-weight:400;color:var(--ink-faint)">4 standards</span></td>
           <td>Human review on every change · review is substantive, not a click · provenance recorded · risk decides process depth</td>
-          <td>Branch protection · a written-sentence requirement checked in CI · a commit trailer check · path-based routing</td>
+          <td>Branch protection with no bypass · a written-sentence requirement checked in CI · a commit trailer check · graph-derived lane routing that fails closed</td>
         </tr>
         <tr>
           <td class="k">The code stays coherent<br><span style="font-weight:400;color:var(--ink-faint)">5 standards</span></td>
@@ -772,8 +773,8 @@
         <tr><td class="k">An unattended path fails silently</td><td>A scheduled job that emits nothing when healthy and nothing when dead. Ingestion counts falling without an error. Quarantine volume at zero for a suspiciously long time.</td><td><strong>The failure that hides longest.</strong> A screen that breaks is reported in minutes; a nightly job that exits early is reported never. Unattended work must <strong>emit a signal on success</strong>, with an alert on the absence of that signal &mdash; and it takes a higher lane than the same logic behind a screen, because nothing else will catch it.</td></tr>
           <tr>
           <td class="k">Nobody can explain what is automated</td>
-          <td>Disagreement about whether a lane is gated. Autonomy levels not written down anywhere current.</td>
-          <td>Publish the levels with a named owner per lane. A silent demotion after an incident is how this erodes — make every change visible, with a stated reason and a route back.</td>
+          <td>Disagreement about whether a lane is gated. The two autonomy dials &mdash; what an agent may touch, and what may run unattended &mdash; not written down anywhere current, or quietly climbing together.</td>
+          <td>Publish both ladders with a named owner each, and climb them on separate schedules &mdash; reach is earned by scope discipline, unattended running by a proven undo. Record reversibility per surface rather than per change. A silent demotion after an incident is how this erodes &mdash; make every change visible, with a stated reason and a route back.</td>
         </tr>
       </tbody>
     </table>
@@ -824,7 +825,5 @@
 </footer>
 
 </div>
-
-
 </body>
 </html>
