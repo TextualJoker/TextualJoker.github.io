@@ -206,6 +206,25 @@
     .family{margin:0 -18px; padding:0 18px;}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important;}}
+  /* ---------- diagram ---------- */
+  figure.dg{margin:26px 0 30px; padding:0;}
+  figure.dg .frame{overflow-x:auto; border:1px solid var(--rule); background:var(--surface); padding:14px;}
+  figure.dg svg{display:block; min-width:760px; width:100%; height:auto; color:var(--ink-soft);}
+  figure.dg figcaption{
+    font-size:14.5px; line-height:1.5; color:var(--ink-faint);
+    margin-top:12px; max-width:68ch;
+  }
+  figure.dg figcaption b{color:var(--ink-soft); font-weight:600;}
+  .dg-line{stroke:currentColor; fill:none; stroke-width:1.4;}
+  .dg-acc{stroke:var(--accent); fill:none; stroke-width:1.8;}
+  .dg-box{fill:var(--surface); stroke:currentColor; stroke-width:1.4;}
+  .dg-accbox{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.6;}
+  .dg-mono{font-family:var(--mono); font-size:11.5px; fill:var(--ink-soft);}
+  .dg-mono-b{font-family:var(--mono); font-size:11.5px; font-weight:600; fill:var(--ink);}
+  .dg-mono-a{font-family:var(--mono); font-size:11.5px; font-weight:600; fill:var(--accent);}
+  .dg-cap{font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.11em; fill:var(--ink-faint);}
+  .dg-note{font-family:var(--body); font-size:11.5px; fill:var(--ink-faint); font-style:italic;}
+  .dg-arrowlbl{font-family:var(--body); font-size:12px; font-weight:600; fill:var(--accent);}
 </style>
 </head>
 <body>
@@ -727,6 +746,74 @@
 
   <p>The ladder above decides how binding a rule is. This decides which file it goes in &mdash; a different question, and the one people actually get stuck on.</p>
 
+  <figure class="dg">
+  <div class="frame">
+    <svg viewBox="0 0 880 604" role="img" aria-label="Two homes for agent instructions. On the left, outside the monorepo, a plugin holds one skill folder per pipeline stage plus hooks. On the right, the monorepo holds a root AGENTS.md and one per service — AppUI, PatientSearchService and PaymentService — each service also holding its own infrastructure. Arrows from both converge on agent-stage.yml, which combines a named skill with the AGENTS.md files on the path to the change into the context for a single run.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+        </marker>
+        <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
+
+      <!-- ============ left: the plugin ============ -->
+      <text x="30" y="28" class="dg-cap">PROCESS &mdash; OWNED CENTRALLY</text>
+      <rect x="30" y="42" width="340" height="252" rx="3" class="dg-box"/>
+
+      <text x="44" y="68"  class="dg-mono-b">acme-pipeline-plugin/</text>
+      <text x="58" y="87"  class="dg-mono">skills/</text>
+      <text x="72" y="106" class="dg-mono">triage/SKILL.md</text>
+      <text x="72" y="125" class="dg-mono">reuse/SKILL.md</text>
+      <text x="72" y="144" class="dg-mono-a">design/SKILL.md</text>
+      <text x="72" y="163" class="dg-mono">tasks/SKILL.md</text>
+      <text x="72" y="182" class="dg-mono">build/SKILL.md</text>
+      <text x="72" y="201" class="dg-mono">verify/SKILL.md</text>
+      <text x="72" y="220" class="dg-mono">review/SKILL.md</text>
+      <text x="58" y="243" class="dg-mono">hooks/</text>
+      <text x="58" y="262" class="dg-mono">.claude-plugin/</text>
+      <text x="44" y="283" class="dg-note">one per pipeline stage &middot; reaches every repo</text>
+
+      <!-- ============ right: the monorepo ============ -->
+      <text x="490" y="28" class="dg-cap">TERRAIN &mdash; OWNED BY THE AREA</text>
+      <rect x="490" y="42" width="360" height="290" rx="3" class="dg-box"/>
+
+      <text x="504" y="68"  class="dg-mono-b">monorepo/</text>
+      <text x="518" y="87"  class="dg-mono-a">AGENTS.md</text>
+      <text x="700" y="87"  class="dg-note">true of everything</text>
+      <text x="518" y="106" class="dg-mono">CLAUDE.md</text>
+      <text x="700" y="106" class="dg-note">one line: @AGENTS.md</text>
+      <text x="518" y="130" class="dg-mono">AppUI/</text>
+      <text x="532" y="149" class="dg-mono">AGENTS.md</text>
+      <text x="518" y="173" class="dg-mono">PatientSearchService/</text>
+      <text x="532" y="192" class="dg-mono">AGENTS.md</text>
+      <text x="532" y="211" class="dg-mono">infra/</text>
+      <text x="518" y="235" class="dg-mono">PaymentService/</text>
+      <text x="532" y="254" class="dg-mono-a">AGENTS.md</text>
+      <text x="700" y="254" class="dg-note">this service only</text>
+      <text x="532" y="273" class="dg-mono">infra/</text>
+      <text x="700" y="273" class="dg-note">its own queue, secrets</text>
+      <text x="504" y="315" class="dg-note">nested &mdash; the agent reads root plus what is on the path</text>
+
+      <!-- ============ converge ============ -->
+      <path d="M 200 294 C 200 380, 300 400, 358 452" class="dg-acc" marker-end="url(#ara)"/>
+      <path d="M 668 332 C 668 400, 580 410, 522 452" class="dg-acc" marker-end="url(#ara)"/>
+
+      <text x="212" y="392" class="dg-arrowlbl">skill: design</text>
+      <text x="668" y="392" text-anchor="end" class="dg-arrowlbl">root + PaymentService/AGENTS.md</text>
+
+      <rect x="300" y="456" width="280" height="62" rx="3" class="dg-accbox"/>
+      <text x="440" y="482" text-anchor="middle" class="dg-mono-a">agent-stage.yml</text>
+      <text x="440" y="502" text-anchor="middle" class="dg-note">one run &middot; plugin version pinned at start</text>
+
+      <line x1="440" y1="518" x2="440" y2="560" class="dg-line" marker-end="url(#ar)"/>
+      <text x="440" y="582" text-anchor="middle" class="dg-mono-b">the context this change actually runs with</text>
+    </svg>
+  </div>
+  <figcaption><b>Nothing is combined until a run starts, and what combines depends on which files the change touches.</b> The stage instruction is chosen by name from the plugin; the terrain files are picked up by proximity in the repository. A change confined to <code>PaymentService</code> never loads AppUI&rsquo;s conventions, which is what keeps each file short enough to be obeyed.</figcaption>
+</figure>
+
   <div class="scroll">
     <table>
       <caption>Five homes, split by owner and rate of change</caption>
@@ -779,6 +866,19 @@
   <div class="note">
     <span class="lbl">In a monorepo, nest them</span>
     <p>One <code>AGENTS.md</code> at the root carrying what is true of everything, and one per area carrying only that area&rsquo;s delta. The agent picks up the root plus whichever sit on the path to the files it is touching. <strong>A single file for a whole monorepo is the version of this that fails</strong>, because it becomes the union of every area&rsquo;s quirks and is read in full for a one-line change.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>What a given change loads &mdash; resolution is by path, not by configuration</caption>
+      <thead><tr><th>The change touches</th><th>The agent loads</th></tr></thead>
+      <tbody>
+        <tr><td class="k"><code>PaymentService/</code> only</td><td>The stage skill, plus root <code>AGENTS.md</code> and <code>PaymentService/AGENTS.md</code>. Two terrain files.</td></tr>
+        <tr><td class="k"><code>AppUI/</code> and <code>PaymentService/</code></td><td>The stage skill, plus root and <em>both</em> service files. Three &mdash; which is the argument for keeping each one short, since a cross-cutting change pays for every area it reaches.</td></tr>
+        <tr><td class="k"><code>PaymentService/infra/</code></td><td>Same as the first row. A service owns its queue, its secrets and its own state, so this stays a single-repository change.</td></tr>
+        <tr><td class="k">Estate infrastructure</td><td><strong>Nothing.</strong> Networks, identity and shared data stores live outside, and no approved agent path reaches them. A person opens that repository deliberately.</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="note warn">
