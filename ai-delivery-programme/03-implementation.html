@@ -222,7 +222,7 @@
   <h1>Implementation</h1>
   <p class="sf">What gets built, in what order, and the small number of things that cannot be added later. Five stages, started by events rather than dates, because a company with no pipeline has no basis for a date.</p>
   <div class="meta">
-    <span>~34 minutes</span>
+    <span>~38 minutes</span>
     <span>Five stages, 48 numbered steps</span>
     <span>Full step detail remains in the original plan</span>
   </div>
@@ -439,7 +439,7 @@
       <span class="trig">Done when: headcount doubles and change failure rate doesn't move</span>
     </div>
     <div class="stage-b">
-      <p><strong>Only start once the flow works manually.</strong> Automating a process you have not run by hand automates your misunderstanding of it.</p>
+      <p><strong>Only start once the flow works with a person driving each stage.</strong> Automating a process you have not run that way automates your misunderstanding of it.</p>
       <ul>
         <li><strong>Declare the bounds before writing any stage</strong> — iteration cap, budget cap, a success function the agent can evaluate itself, an escalation path, and no-progress detection. The budget cap is two numbers: per stage, and accumulated per run.</li>
         <li><strong>Build the shared stage harness first.</strong> If stages are written individually the bounds get implemented eleven times and eleven ways, and the one that gets skipped is the one that runs away.</li>
@@ -454,7 +454,7 @@
 
   <div class="note warn">
     <span class="lbl">The ordering mistake to avoid</span>
-    <p>Every one of these stages is tempting to start early, and stage 5 is the most tempting of all because it is the interesting one. <strong>Automating a workflow nobody has run manually produces a fast, confident version of the wrong process</strong> — and because it is automated, the wrongness is now consistent and hard to see.</p>
+    <p>Every one of these stages is tempting to start early, and stage 5 is the most tempting of all because it is the interesting one. <strong>Automating a workflow nobody has run stage by stage, with a person reading each handoff, produces a fast, confident version of the wrong process</strong> — and because it is automated, the wrongness is now consistent and hard to see.</p>
   </div>
 </section>
 
@@ -512,7 +512,7 @@
           <tr><td class="n">19</td><td class="k">Map where member data flows, then compute lanes from the dependency graph</td><td>Two artefacts in one sitting. First <strong>a map of where protected health information enters, rests, moves and leaves</strong> &mdash; the spine the rest of the risk machinery hangs from, not a category within it. Then lane routing derived from the <strong>dependency graph</strong>, meaning what a change touches and everything that depends on it, rather than from hand-written path rules. Path rules fail silently in two directions: new code matches nothing and lands in the default lane, and a shared helper reads as harmless when the thing importing it is billing. <strong>Unclassified routes to the top lane</strong>, so a miss sends work up and never down. Keep a short hand-kept list of always-top-lane surfaces underneath, because the graph is static reach only and cannot see coupling through a queue, an event or a shared table &mdash; the graph may promote a change, the list may never demote one. Per-change threat models and named review perspectives (security, PHI flow, infrastructure, clinical safety) attach to the top two lanes here. Review capacity is the binding constraint, so spending it uniformly spends it badly.</td><td class="n">A day</td></tr>
           <tr><td class="n">20</td><td class="k">The system overview &mdash; one page</td><td>The design stage reads this, so it exists before the first feature. Services, where data lives, boundaries that must not be crossed, and <strong>what is deliberately undecided</strong> so an agent proposes rather than assumes. The system-level threat model lives with this page and is revisited on the same cadence.</td><td class="n">An hour</td></tr>
           <tr><td class="n">21</td><td class="k">Design tokens and the generation chain</td><td>Before any component &mdash; one built against a hand-written colour is one to redo. Stand it up with placeholder values if the palette is not ready; the pipeline matters more than the values on day one.</td><td class="n">A day</td></tr>
-          <tr><td class="n">22</td><td class="k">The remaining shared homes, empty</td><td>The destination has to exist before the first shared thing is written, or it lands in a feature folder and is invisible forever. Each with an owner and a README saying what belongs there.</td><td class="n">Half a day</td></tr>
+          <tr><td class="n">22</td><td class="k">The remaining shared homes, empty</td><td>The destination has to exist before the first shared thing is written, or it lands in a feature folder and is invisible forever. Each with an owner and a README saying what belongs there. This includes the instruction files: <code>AGENTS.md</code> at the root and one per area, with <code>CLAUDE.md</code> holding a single <code>@AGENTS.md</code> import so both toolchains read one file rather than two that drift.</td><td class="n">Half a day</td></tr>
           <tr><td class="n">23</td><td class="k">Environments, with production gated from day one</td><td>Almost impossible to retrofit once things are deployed. The required-reviewer rule wants setting while it costs nothing &mdash; adding a gate later reads as distrust. <br><br><strong>And set the flag lifecycle rules here, before the first flag exists.</strong> <span class="tag t-no">Unrecoverable in practice</span> Every flag carries a named owner and a removal date as required fields; CI warns at fourteen days out and fails the build on the date; permanent kill switches are marked as a different kind so the cleanup rule skips them. Introducing this against two hundred existing flags means auditing two hundred flags, which nobody will do &mdash; so it is now or never. <br><br><strong>The exception register runs on the same expiry engine.</strong> Anywhere a rule is knowingly broken gets an entry with a named owner and a hard expiry date, enforced by the identical check. One mechanism serving two purposes, rather than two half-built ones discovered to be the same thing a year later.</td><td class="n">A day</td></tr>
           <tr><td class="n">24</td><td class="k">Telemetry on, pointed anywhere</td><td>Free, and history cannot be generated retroactively. Content logging stays off.</td><td class="n">Free</td></tr>
           <tr><td class="n">25</td><td class="k">Start the synthetic dataset</td><td>Long lead time. Without a convincing one, people eventually reach for real data and no automated guard catches every route.</td><td class="n">Ongoing</td></tr>
@@ -523,9 +523,16 @@
     <h3>Stage 3 &middot; One team runs the flow by hand</h3>
     <p class="stagenote">Resist expanding. <strong>Move on when the rough edges are logged and the pilot team would choose the paved road over going round it.</strong></p>
 
+    <div class="note">
+      <span class="lbl">What &ldquo;by hand&rdquo; means here, because it reads as the wrong thing</span>
+      <p><strong>Every stage is agent-driven at this point. What is manual is the orchestration, not the work.</strong> Each stage is a command a person invokes; they read its output, decide it is good enough, and hand it to the next one. Nothing flows on its own and nothing is triggered by CI. Step 27 ships those commands precisely so that this is possible.</p>
+      <p>Doing the work without an agent would teach nothing that transfers. <strong>The output of this stage is the pipeline</strong> &mdash; the prompts, the shape of a plan the next stage can actually use, the handoff that turns out to be missing a field, the failure modes worth guarding. Stage 5 builds the conveyor belt; stage 3 is where the thing being conveyed gets built and hardened.</p>
+      <p>Put another way: <strong>stage 3 is all eleven stages gated by a person.</strong> Stage 5 removes those gates in reversibility order until only the two permanent ones remain. What is being de-risked here is the process, not the tooling &mdash; whether the model can write the code was never the open question.</p>
+    </div>
+
     <div class="scroll">
       <table>
-        <caption>Steps 26&ndash;35 &middot; prove it once, manually</caption>
+        <caption>Steps 26&ndash;35 &middot; prove it once, with a person between every stage</caption>
         <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
         <tbody>
           <tr><td class="n">26</td><td class="k">Pick the pilot team by throughput, not enthusiasm</td><td>A baseline of two or more changes a week predicted retention; seniority and stated enthusiasm predicted adoption but not retention. Pick a team whose success is visible to others.</td><td class="n">A conversation</td></tr>
@@ -559,7 +566,7 @@
     </div>
 
     <h3>Stage 5 &middot; Automate the pipeline</h3>
-    <p class="stagenote"><strong>Only once the flow works manually.</strong> Automating a process nobody has run by hand produces a fast, confident version of the wrong process.</p>
+    <p class="stagenote"><strong>Only once the flow works with a person driving each stage.</strong> Automating a process nobody has run that way produces a fast, confident version of the wrong process.</p>
 
     <div class="scroll">
       <table>
@@ -567,7 +574,7 @@
         <thead><tr><th>#</th><th>Step</th><th>Why here</th><th>Effort</th></tr></thead>
         <tbody>
           <tr><td class="n">40</td><td class="k">Declare the bounds before writing any stage</td><td>Iteration cap, budget cap, a success function the agent evaluates itself, an escalation path, no-progress detection. <strong>The budget cap is two numbers</strong> &mdash; per stage and accumulated per run &mdash; because per-stage caps do not bound a feature.</td><td class="n">An hour</td></tr>
-          <tr><td class="n">41</td><td class="k">Build the shared stage harness first</td><td>Written individually, the bounds get implemented eleven times and eleven ways, and the one that gets skipped is the one that runs away.</td><td class="n">2&ndash;3 days</td></tr>
+          <tr><td class="n">41</td><td class="k">Build the shared stage harness first</td><td>Written individually, the bounds get implemented eleven times and eleven ways, and the one that gets skipped is the one that runs away. One reusable workflow &mdash; <code>agent-stage.yml</code> &mdash; taking skill name, model, effort, iteration cap, budget cap and run identifier as inputs, with callers pinned to a tag rather than a branch.</td><td class="n">2&ndash;3 days</td></tr>
           <tr><td class="n">42</td><td class="k">Give the run an owner and a close <span class="tag t-info">New</span></td><td><strong>Currently missing from this design.</strong> Stages are independent jobs triggered by labels, so nothing is accountable for a piece of work end to end &mdash; it can stall between stages and nothing notices. One orchestrating step holds the run identifier, enforces the gates in order, and <strong>closes with a summary</strong>. That summary is also the traceability record, and the <strong>completeness ledger</strong>: every requirement ID in the approved spec claimed by a passing tagged scenario, and the union of the diffs read once as a whole against that spec. Nothing approved missing, nothing unapproved added &mdash; and the second half is the one no single-change review is positioned to see. A spec spanning several merges freezes on the last of them, not the first.</td><td class="n">2 days</td></tr>
           <tr><td class="n">43</td><td class="k">Add the ambiguity path <span class="tag t-info">New</span></td><td><strong>Also missing.</strong> Triage currently classifies confidently every time. When the ask is genuinely unclear the correct behaviour is to stop and ask a person, not to guess well. Failing to ask for clarification is <strong>6.8% of observed agent failures</strong> &mdash; thirteen times more common than the role-confusion failure this plan spends a section arguing about.</td><td class="n">A day</td></tr>
           <tr><td class="n">44</td><td class="k">Bound each stage to its approved scope <span class="tag t-info">New</span></td><td>The approved plan defines which paths may be touched, and the harness enforces it rather than trusting the agent to stay inside &mdash; so scope creep fails a check instead of arriving in review.<br><br><strong>Pair it with the detection half: a scope pass at review.</strong> An agent is given the spec and the diff and asked one question &mdash; <em>what does this change do that the spec does not ask for?</em> Containment catches whole unplanned additions before code exists; the pass catches the coherent, working, unauthorised behaviour that a human reviewer reliably misses because it reads as thoughtfulness. <strong>Every finding is a decision</strong> &mdash; remove it, or approve it into the spec retroactively. Never absorbed unremarked.</td><td class="n">A day</td></tr>
@@ -714,6 +721,70 @@
   <div class="note good">
     <span class="lbl">Why skills matter more than they look</span>
     <p>A CI check catches a mistake <em>after</em> it is made. A skill means the mistake is less likely to be made at all. <strong>They are the same standard expressed twice, deliberately</strong> — the skill makes the right thing the default output, the check makes the wrong thing impossible to merge. Skills without checks decay silently; checks without skills produce a loop where the agent generates, fails and retries.</p>
+  </div>
+
+  <h3>Where the instructions themselves live</h3>
+
+  <p>The ladder above decides how binding a rule is. This decides which file it goes in &mdash; a different question, and the one people actually get stuck on.</p>
+
+  <div class="scroll">
+    <table>
+      <caption>Five homes, split by owner and rate of change</caption>
+      <thead><tr><th>What</th><th>Where</th><th>Owned by</th><th>Changes</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">A pipeline stage&rsquo;s instruction</td>
+          <td>A <strong>skill</strong>, shipped in the organisation plugin. The harness invokes it by name.</td>
+          <td>Whoever owns the pipeline</td>
+          <td>Rarely, and centrally</td>
+        </tr>
+        <tr>
+          <td class="k">The stage harness</td>
+          <td><code>agent-stage.yml</code> &mdash; one reusable CI workflow every stage calls. Inputs: skill, model, effort, iteration cap, budget cap, run identifier, tools.</td>
+          <td>Platform</td>
+          <td>Rarely. <strong>Callers pin a tag, never a branch.</strong></td>
+        </tr>
+        <tr>
+          <td class="k">Organisation-wide conventions</td>
+          <td>The <strong>plugin</strong> &mdash; one installable unit bundling skills, hooks, subagents and MCP servers, distributed from an organisation marketplace.</td>
+          <td>Platform</td>
+          <td>Improving every repository becomes a version bump</td>
+        </tr>
+        <tr>
+          <td class="k">What this area of the code is like</td>
+          <td><code>AGENTS.md</code> &mdash; what it does, its vocabulary, its local quirks. <strong>A few lines.</strong></td>
+          <td>The owning team</td>
+          <td>With the code</td>
+        </tr>
+        <tr>
+          <td class="k">Reading it from Claude</td>
+          <td><code>CLAUDE.md</code>, containing exactly one line: <code>@AGENTS.md</code></td>
+          <td>Nobody, once written</td>
+          <td>Never</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>The split is by owner and rate of change, not by subject.</strong> A stage instruction describes the process and is the same everywhere; an <code>AGENTS.md</code> describes terrain and changes when that terrain does. Different people maintain them at different rates &mdash; the same reasoning that separates estate infrastructure from service-owned resources.</p>
+
+  <p>The stage instructions belong in the plugin rather than in the monorepo for one practical reason: <strong>the monorepo is a destination, not a migration</strong>, so the existing repositories live alongside it for a long time. A plugin reaches all of them without copy-paste, and carries the hooks and MCP servers with it.</p>
+
+  <div class="note warn">
+    <span class="lbl">The failure mode: everything ends up in AGENTS.md</span>
+    <p>&ldquo;What this part of the code is like&rdquo; is exactly the content that sprawls, and the instruction file is the <em>weakest</em> of the four mechanisms above. Most of it does not belong there: the decidable half is a CI check, the judgement half is a skill, and what is left is a few lines of vocabulary and local quirks.</p>
+    <p><strong>Adherence falls as the file grows</strong>, so a long one causes the rules inside it to be ignored. When the agent keeps breaking a written rule the diagnostic is never to add emphasis &mdash; it is that the file is too long.</p>
+  </div>
+
+  <div class="note">
+    <span class="lbl">In a monorepo, nest them</span>
+    <p>One <code>AGENTS.md</code> at the root carrying what is true of everything, and one per area carrying only that area&rsquo;s delta. The agent picks up the root plus whichever sit on the path to the files it is touching. <strong>A single file for a whole monorepo is the version of this that fails</strong>, because it becomes the union of every area&rsquo;s quirks and is read in full for a one-line change.</p>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">A prompt change is a production change</span>
+    <p><strong>Pin the plugin version at the start of a run and hold it for that run.</strong> Same rule as a feature flag, with the run as the unit of consistency &mdash; a skill edited halfway through gives a result nobody can reason about afterwards.</p>
+    <p>And record which versions composed each run. Once agents run delivery, editing the reviewer&rsquo;s skill silently alters the quality gate on every change in the company, and a bad run cannot be investigated without knowing what was actually in context for it.</p>
   </div>
 </section>
 
