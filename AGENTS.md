@@ -16,10 +16,12 @@ SOURCE (entries, build scripts, tests, dev-log flow) is the private sibling
   the artefact here.
 - Building is not publishing. The build writes `index.html`; the entry is not
   live until `git push` from this repo.
-- `ai-delivery-programme/` holds work-account artifacts, frozen since the
-  work account ended (2026-10-23; the refresh script was retired
-  2026-10-24). Those pages are `noindex, nofollow` on purpose — unlisted
-  working documents.
+- ⛔ `ai-delivery-programme/` and `founding-engineering-plan/` are the
+  OWNER'S OWN plans for his new company, not a former employer's documents.
+  Keep them; never remove or delist them as part of any offboarding (owner
+  2026-10-19). They are `noindex, nofollow` on purpose — public but unlisted,
+  and in the NecroSpec dev-site spec. No refresh script (retired 2026-10-24).
+  Decision: `docs/work-pages-public-unlisted-2026-10-14.md`.
 - `quest.json` ships alongside `index.html` (`../tj-site/scripts/portal-quest.mjs`).
 - The install counter is rewritten daily by the Agent OS job
   `portal/update-portal-stats`; the dev log is nudged daily by `portal/devlog-due`
