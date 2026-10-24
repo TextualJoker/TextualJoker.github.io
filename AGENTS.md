@@ -16,9 +16,10 @@ SOURCE (entries, build scripts, tests, dev-log flow) is the private sibling
   the artefact here.
 - Building is not publishing. The build writes `index.html`; the entry is not
   live until `git push` from this repo.
-- `ai-delivery-programme/` holds work-account artifacts refreshed by
-  `../tj-site/scripts/refresh-programme.mjs`. Those pages are
-  `noindex, nofollow` on purpose — unlisted working documents.
+- `ai-delivery-programme/` holds work-account artifacts, frozen since the
+  work account ended (2026-10-23; the refresh script was retired
+  2026-10-24). Those pages are `noindex, nofollow` on purpose — unlisted
+  working documents.
 - `quest.json` ships alongside `index.html` (`../tj-site/scripts/portal-quest.mjs`).
 - The install counter is rewritten daily by the Agent OS job
   `portal/update-portal-stats`; the dev log is nudged daily by `portal/devlog-due`
