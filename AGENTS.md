@@ -14,14 +14,19 @@ SOURCE (entries, build scripts, tests, dev-log flow) is the private sibling
 - ⛔ `index.html` (and `main.js`, `feed.xml`, `assets/`) is now a BUILD
   ARTEFACT of NecroSpec-alpha's `deploy_v2.py` — it overwrites all of them
   whole on every run, last-write-wins, and it went live for real 2026-10-30
-  (`b0cb6c7`). `../tj-site/scripts/build-portal.mjs` still lands a fresh
-  devlog entry here first (NecroSpec's own bump step reads that landing), but
-  `deploy_v2.py` runs after it in the same daily chain and overwrites
-  whatever build-portal.mjs wrote — so build-portal.mjs's own output is never
-  what ships. Never hand-edit `index.html` or `main.js`. Decision + evidence:
+  (`b0cb6c7`). Never hand-edit `index.html` or `main.js`. Decision + evidence:
   `docs/devsite-v2-index-ownership-2026-10-30.md`.
-- Building is not publishing. The build writes `index.html`; the entry is not
-  live until `git push` from this repo.
+- ⛔ `../tj-site/scripts/build-portal.mjs` no longer lands a devlog entry here
+  — there is no `<ul class="log">` region left in `index.html` for it to write
+  into (deploy_v2.py's SPA shell), and anything it wrote would be discarded
+  by the next `deploy_v2.py` run regardless. It now validates the entry
+  (tags, length) and no-ops, by design, rather than throwing
+  (PORTAL-DEVLOG-PUBLISH-BROKEN-BY-DEVSITE-V2, 2026-10-30). How a new entry
+  actually reaches the live v2 page is an open cross-repo design question
+  (tj-site/tj-deploy/NecroSpec-alpha) — see the queued
+  `PORTAL-DEVLOG-LANDING-REDESIGN` row, not decided here.
+- Building is not publishing, for what `deploy_v2.py` still does write: that
+  artefact is not live until `git push` from this repo.
 - ⛔ `ai-delivery-programme/` and `founding-engineering-plan/` are the
   OWNER'S OWN plans for his new company, not a former employer's documents.
   Keep them; never remove or delist them as part of any offboarding (owner
