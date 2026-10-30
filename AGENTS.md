@@ -22,9 +22,15 @@ SOURCE (entries, build scripts, tests, dev-log flow) is the private sibling
   by the next `deploy_v2.py` run regardless. It now validates the entry
   (tags, length) and no-ops, by design, rather than throwing
   (PORTAL-DEVLOG-PUBLISH-BROKEN-BY-DEVSITE-V2, 2026-10-30). How a new entry
-  actually reaches the live v2 page is an open cross-repo design question
-  (tj-site/tj-deploy/NecroSpec-alpha) — see the queued
-  `PORTAL-DEVLOG-LANDING-REDESIGN` row, not decided here.
+  reaches the live v2 page is **decided, not yet wired**: NecroSpec-alpha's
+  `tools/harvest/html-facts/devsite-v2/sync_logitems.py` reads tj-site's own
+  `content/entries/*.md` directly — the old harvest-from-this-repo's-rendered-
+  HTML path is a closed NecroSpec→NecroSpec loop since `deploy_v2.py` took
+  over `index.html` whole, and can never see a new entry again
+  (`PORTAL-DEVLOG-LANDING-REDESIGN`,
+  `NecroSpec-alpha/docs/necrospec-devlog-ingest-seam-2026-10-30.md`). The
+  cron step to run it and land the result is `portal:PORTAL-DEVLOG-INGEST-WIRING`
+  (queued, gated on a test fix); nothing in this repo changes for it.
 - Building is not publishing, for what `deploy_v2.py` still does write: that
   artefact is not live until `git push` from this repo.
 - ⛔ `ai-delivery-programme/` and `founding-engineering-plan/` are the
