@@ -29,8 +29,10 @@ SOURCE (entries, build scripts, tests, dev-log flow) is the private sibling
   over `index.html` whole, and can never see a new entry again
   (`PORTAL-DEVLOG-LANDING-REDESIGN`,
   `NecroSpec-alpha/docs/necrospec-devlog-ingest-seam-2026-10-30.md`). The
-  cron step to run it and land the result is `portal:PORTAL-DEVLOG-INGEST-WIRING`
-  (queued, gated on a test fix); nothing in this repo changes for it.
+  cron step to run it and land the result is wired now
+  (`portal:PORTAL-DEVLOG-INGEST-WIRING`): `~/agent-os/projects/portal/jobs/
+  devsite-logitems-due.mjs`, daily at :37, chained between devsite-bump-due
+  (:35) and devsite-deploy-due (:40); nothing in this repo changes for it.
 - Building is not publishing, for what `deploy_v2.py` still does write: that
   artefact is not live until `git push` from this repo.
 - ⛔ `ai-delivery-programme/` and `founding-engineering-plan/` are the
