@@ -33,6 +33,12 @@ SOURCE (entries, build scripts, tests, dev-log flow) is the private sibling
   (`portal:PORTAL-DEVLOG-INGEST-WIRING`): `~/agent-os/projects/portal/jobs/
   devsite-logitems-due.mjs`, daily at :37, chained between devsite-bump-due
   (:35) and devsite-deploy-due (:40); nothing in this repo changes for it.
+  Confirmed live 2026-11-01 (`portal:DEVSITE-V2-GO-LIVE`): the 08:30-08:41
+  chain ran for real (`/tmp/portal-devsite-logitems-due.log`,
+  `/tmp/portal-devsite-deploy-due.log`) and landed `9507269` here — `main.js`
+  and `feed.xml` carry dev-log entries through 2026-10-31, the newest tj-site
+  had at deploy time (2026-11-01's own entry was only filed as a queue row
+  that run, not yet written).
 - Building is not publishing, for what `deploy_v2.py` still does write: that
   artefact is not live until `git push` from this repo.
 - ⛔ `ai-delivery-programme/` and `founding-engineering-plan/` are the
