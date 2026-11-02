@@ -1236,12 +1236,6 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         --brass: #b87a1e;
         --live: #2f8f63;
         --spine: 45rem;
-        --mono:
-          ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo,
-          Consolas, monospace;
-        --sans:
-          ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-          "Helvetica Neue", sans-serif;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -1283,7 +1277,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         margin: 0;
         background: var(--ground);
         color: var(--ink);
-        font-family: var(--sans);
+        font-family: var(--font-sans);
         line-height: 1.65;
         font-size: 16px;
         -webkit-font-smoothing: antialiased;
@@ -1292,7 +1286,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         color: inherit;
       }
       code {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.86em;
         background: color-mix(in srgb, var(--brass) 14%, transparent);
         padding: 0.05em 0.35em;
@@ -1329,7 +1323,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         background: var(--ground);
       }
       .mark {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-weight: 700;
         font-size: 0.95rem;
         letter-spacing: -0.02em;
@@ -1364,7 +1358,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         display: flex;
         flex-direction: column;
         gap: 1.15rem;
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.72rem;
       }
       .status li {
@@ -1391,7 +1385,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       }
       .rail-h {
         margin: 1.9rem 0 0.7rem;
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.62rem;
         text-transform: uppercase;
         letter-spacing: 0.14em;
@@ -1404,7 +1398,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         display: flex;
         flex-direction: column;
         gap: 0.55rem;
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.72rem;
       }
       .socials a {
@@ -1440,7 +1434,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       }
 
       .term {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.82rem;
         color: var(--muted);
         margin: 0 0 2rem;
@@ -1453,7 +1447,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       }
 
       h1 {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: clamp(2.1rem, 6vw, 3.15rem);
         font-weight: 700;
         letter-spacing: -0.04em;
@@ -1489,7 +1483,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       }
 
       .eyebrow {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.64rem;
         text-transform: uppercase;
         letter-spacing: 0.2em;
@@ -1534,7 +1528,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         gap: 1rem;
       }
       .proj h2 {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 1.15rem;
         font-weight: 700;
         letter-spacing: -0.02em;
@@ -1542,7 +1536,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       }
       .proj .tag,
       section.scene .tag {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.6rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
@@ -1555,7 +1549,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         font-size: 0.94rem;
       }
       .proj .meta {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.72rem;
         color: var(--ink);
         display: flex;
@@ -1588,7 +1582,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         border-top: 1px solid var(--hair);
       }
       .log time {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.72rem;
         color: var(--muted);
         font-variant-numeric: tabular-nums;
@@ -1600,7 +1594,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         font-size: 0.96rem;
       }
       .log .by {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.68rem;
         color: var(--muted);
         margin-top: 0.3rem;
@@ -1629,7 +1623,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         gap: 0.6rem;
         padding: 0.6rem 0.9rem;
         border-bottom: 1px solid var(--hair);
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.66rem;
         letter-spacing: 0.02em;
         color: var(--muted);
@@ -1672,7 +1666,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         position: absolute;
         right: 0.5rem;
         top: 0.5rem;
-        font: 500 0.6rem var(--mono);
+        font: 500 0.6rem var(--font-mono);
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--muted);
@@ -1688,7 +1682,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         border-color: var(--brass);
       }
       p.cap {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.68rem;
         color: var(--muted);
         margin: 0.4rem 0 0;
@@ -1699,7 +1693,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         font-weight: 600;
       }
       section.scene h2 {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 1.15rem;
         font-weight: 700;
         letter-spacing: -0.02em;
@@ -1714,7 +1708,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         font-size: 0.94rem;
       }
       p.rule code {
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         color: var(--ink);
       }
       ul.roles {
@@ -1729,7 +1723,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       }
       ul.roles .role {
         display: block;
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.8rem;
         color: var(--ink);
       }
@@ -1738,7 +1732,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         margin-top: 3.5rem;
         padding-top: 1.5rem;
         border-top: 1px solid var(--hair);
-        font-family: var(--mono);
+        font-family: var(--font-mono);
         font-size: 0.68rem;
         color: var(--muted);
         display: flex;
@@ -1814,7 +1808,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       }
       ul.featured a:hover { color: var(--brass); }
       ul.featured time {
-        font: 500 0.72rem var(--mono);
+        font: 500 0.72rem var(--font-mono);
         color: var(--muted);
         white-space: nowrap;
       }
@@ -1824,7 +1818,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         margin: 1.15rem 0;
         padding: 0.1rem 0 0.1rem 1rem;
         border-left: 2px solid var(--brass);
-        font: 600 1.05rem/1.5 var(--sans);
+        font: 600 1.05rem/1.5 var(--font-sans);
         color: var(--ink);
       }
 
@@ -1836,7 +1830,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         gap: 1rem;
       }
       button.rand {
-        font: 500 0.68rem var(--mono);
+        font: 500 0.68rem var(--font-mono);
         letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--muted);
@@ -1852,7 +1846,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       /* What I am building right now: the spec's assets/quest.json. */
       p.now {
         margin: 0.35rem 0 0;
-        font: 500 0.72rem var(--mono);
+        font: 500 0.72rem var(--font-mono);
         letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--muted);
@@ -1868,14 +1862,14 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         margin: 0 0 0.9rem;
       }
       p.post-meta .rt {
-        font: 500 0.66rem var(--mono);
+        font: 500 0.66rem var(--font-mono);
         letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--muted);
         margin-right: 0.35rem;
       }
       button.tag {
-        font: 500 0.64rem var(--mono);
+        font: 500 0.64rem var(--font-mono);
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--muted);
@@ -1898,12 +1892,12 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         background: var(--panel);
         border: 1px solid var(--hair);
         border-radius: 0.4rem;
-        font: 500 0.74rem/1.6 var(--mono);
+        font: 500 0.74rem/1.6 var(--font-mono);
         color: var(--ink);
       }
       figure.term figcaption {
         margin-top: 0.4rem;
-        font: 500 0.66rem var(--mono);
+        font: 500 0.66rem var(--font-mono);
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--muted);
@@ -1920,7 +1914,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       }
       p.lesson b {
         display: block;
-        font: 600 0.64rem var(--mono);
+        font: 600 0.64rem var(--font-mono);
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: var(--live);
@@ -1937,7 +1931,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         border-top: 1px solid var(--hair);
       }
       nav.related b {
-        font: 600 0.64rem var(--mono);
+        font: 600 0.64rem var(--font-mono);
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: var(--muted);
@@ -1950,7 +1944,7 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
       .logfoot { margin: 0 0 2.6rem; }
       button.more {
         width: 100%;
-        font: 500 0.7rem var(--mono);
+        font: 500 0.7rem var(--font-mono);
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: var(--ink);
@@ -1970,13 +1964,13 @@ Owned: facebook 18 \xB7 tiktok.com 16 \xB7 threads 7 \xB7 mastodon 4 \xB7 bluesk
         margin-top: 1.1rem;
       }
       nav.archive b {
-        font: 600 0.64rem var(--mono);
+        font: 600 0.64rem var(--font-mono);
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: var(--muted);
       }
       button.arch {
-        font: 500 0.68rem var(--mono);
+        font: 500 0.68rem var(--font-mono);
         color: var(--muted);
         background: transparent;
         border: 1px solid var(--hair);
